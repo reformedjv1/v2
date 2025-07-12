@@ -1,4 +1,5 @@
 
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,7 @@ import { PillarCard } from "@/components/PillarCard";
 import { Activity, DollarSign, Heart, ArrowRight, Star, Target, TrendingUp } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
   const pillars = [
     {
       id: 'health',
@@ -110,15 +112,29 @@ const Index = () => {
         {/* Quick Actions */}
         <div className="text-center">
           <h3 className="text-2xl font-semibold mb-6">Ready to Optimize Your Life?</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-green-500 hover:bg-green-600">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
+            <Button 
+              size="lg" 
+              className="bg-green-500 hover:bg-green-600 w-full sm:w-auto"
+              onClick={() => navigate('/health')}
+            >
               Start Health Assessment
             </Button>
-            <Button size="lg" variant="outline">
-              View Pricing Tiers
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() => navigate('/wealth')}
+            >
+              View Wealth Dashboard
             </Button>
-            <Button size="lg" variant="ghost">
-              Learn the Science
+            <Button 
+              size="lg" 
+              variant="ghost"
+              className="w-full sm:w-auto"
+              onClick={() => navigate('/relations')}
+            >
+              Improve Relations
             </Button>
           </div>
         </div>

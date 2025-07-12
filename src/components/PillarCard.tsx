@@ -1,4 +1,5 @@
 
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,8 +23,13 @@ interface PillarProps {
 }
 
 export const PillarCard = ({ pillar }: PillarProps) => {
+  const navigate = useNavigate();
   const { icon: Icon } = pillar;
   const isPositiveTrend = pillar.stats.trend.startsWith('+');
+
+  const handleOptimizeClick = () => {
+    navigate(`/${pillar.id}`);
+  };
 
   return (
     <Card className="h-full hover:shadow-lg transition-shadow duration-300">
@@ -61,7 +67,10 @@ export const PillarCard = ({ pillar }: PillarProps) => {
           ))}
         </div>
         
-        <Button className="w-full mt-4 group">
+        <Button 
+          className="w-full mt-4 group" 
+          onClick={handleOptimizeClick}
+        >
           Optimize {pillar.title}
           <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
         </Button>
