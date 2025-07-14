@@ -153,146 +153,171 @@ export function DietTracker() {
   };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Utensils className="h-5 w-5" />
+    <div className="space-y-6 px-4 pb-6">
+      {/* Log Food Card */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Utensils className="h-5 w-5 text-primary" />
+            </div>
             Diet Tracker
           </CardTitle>
-          <CardDescription>Track your daily nutrition and calories</CardDescription>
+          <CardDescription className="text-sm">Track your daily nutrition and calories</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="food-name">Food Name</Label>
+        <CardContent className="space-y-6">
+          {/* Food Details */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="food-name" className="text-sm font-medium">Food Name</Label>
               <Input
                 id="food-name"
                 placeholder="e.g., Grilled chicken breast"
                 value={foodName}
                 onChange={(e) => setFoodName(e.target.value)}
+                className="h-12"
               />
             </div>
-            <div>
-              <Label htmlFor="meal-type">Meal Type</Label>
+            <div className="space-y-2">
+              <Label htmlFor="meal-type" className="text-sm font-medium">Meal Type</Label>
               <Select value={mealType} onValueChange={setMealType}>
-                <SelectTrigger>
+                <SelectTrigger className="h-12">
                   <SelectValue placeholder="Select meal type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="breakfast">Breakfast</SelectItem>
-                  <SelectItem value="lunch">Lunch</SelectItem>
-                  <SelectItem value="dinner">Dinner</SelectItem>
-                  <SelectItem value="snack">Snack</SelectItem>
+                  <SelectItem value="breakfast">🌅 Breakfast</SelectItem>
+                  <SelectItem value="lunch">☀️ Lunch</SelectItem>
+                  <SelectItem value="dinner">🌙 Dinner</SelectItem>
+                  <SelectItem value="snack">🍎 Snack</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <Label htmlFor="calories">Calories</Label>
+          {/* Nutrition Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="calories" className="text-sm font-medium">Calories</Label>
               <Input
                 id="calories"
                 type="number"
                 placeholder="250"
                 value={calories}
                 onChange={(e) => setCalories(e.target.value)}
+                className="h-12 text-center"
               />
             </div>
-            <div>
-              <Label htmlFor="protein">Protein (g)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="protein" className="text-sm font-medium">Protein (g)</Label>
               <Input
                 id="protein"
                 type="number"
                 placeholder="25"
                 value={protein}
                 onChange={(e) => setProtein(e.target.value)}
+                className="h-12 text-center"
               />
             </div>
-            <div>
-              <Label htmlFor="carbs">Carbs (g)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="carbs" className="text-sm font-medium">Carbs (g)</Label>
               <Input
                 id="carbs"
                 type="number"
                 placeholder="30"
                 value={carbs}
                 onChange={(e) => setCarbs(e.target.value)}
+                className="h-12 text-center"
               />
             </div>
-            <div>
-              <Label htmlFor="fat">Fat (g)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="fat" className="text-sm font-medium">Fat (g)</Label>
               <Input
                 id="fat"
                 type="number"
                 placeholder="10"
                 value={fat}
                 onChange={(e) => setFat(e.target.value)}
+                className="h-12 text-center"
               />
             </div>
           </div>
 
+          {/* Log Button */}
           <Button 
             onClick={addFoodEntry} 
             disabled={!foodName || !calories || !mealType || isLoading}
-            className="w-full"
+            className="w-full h-12 text-base font-medium"
+            size="lg"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-5 w-5 mr-2" />
             Log Food
           </Button>
         </CardContent>
       </Card>
 
+      {/* Daily Goals Card */}
       {healthProfile && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Daily Nutrition Goals
+        <Card className="shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Target className="h-5 w-5 text-primary" />
+              </div>
+              Daily Goals
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Calories</span>
-                  <span>{getTotalCalories()}/{healthProfile.daily_caloric_target || 2000}</span>
-                </div>
-                <Progress value={getCalorieProgress()} className="h-2" />
+          <CardContent className="space-y-6">
+            {/* Calorie Progress */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Calories</span>
+                <span className="text-sm text-muted-foreground">
+                  {getTotalCalories()}/{healthProfile.daily_caloric_target || 2000}
+                </span>
               </div>
-
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-xl font-bold text-blue-600">{getTotalMacro('protein_g')}g</div>
-                  <p className="text-xs text-muted-foreground">Protein</p>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-green-600">{getTotalMacro('carbs_g')}g</div>
-                  <p className="text-xs text-muted-foreground">Carbs</p>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-orange-600">{getTotalMacro('fat_g')}g</div>
-                  <p className="text-xs text-muted-foreground">Fat</p>
-                </div>
-              </div>
-
-              {calculateBMI() > 0 && (
-                <div className="text-center p-3 bg-muted rounded-lg">
-                  <div className="text-lg font-semibold">BMI: {calculateBMI()}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Goal: {healthProfile.goal_type} weight
-                  </div>
-                </div>
-              )}
+              <Progress value={getCalorieProgress()} className="h-3" />
             </div>
+
+            {/* Macros Grid */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  {getTotalMacro('protein_g')}g
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Protein</p>
+              </div>
+              <div className="text-center p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                <div className="text-xl font-bold text-green-600 dark:text-green-400">
+                  {getTotalMacro('carbs_g')}g
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Carbs</p>
+              </div>
+              <div className="text-center p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                <div className="text-xl font-bold text-orange-600 dark:text-orange-400">
+                  {getTotalMacro('fat_g')}g
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Fat</p>
+              </div>
+            </div>
+
+            {/* BMI Display */}
+            {calculateBMI() > 0 && (
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-lg font-semibold">BMI: {calculateBMI()}</div>
+                <div className="text-sm text-muted-foreground">
+                  Goal: {healthProfile.goal_type} weight
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
 
+      {/* Today's Meals Card */}
       {foodEntries.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Today's Meals</CardTitle>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">Today's Meals</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -300,18 +325,30 @@ export function DietTracker() {
                 const mealEntries = getMealEntries(meal);
                 if (mealEntries.length === 0) return null;
                 
+                const mealEmojis = {
+                  breakfast: '🌅',
+                  lunch: '☀️',
+                  dinner: '🌙',
+                  snack: '🍎'
+                };
+                
                 return (
-                  <div key={meal} className="space-y-2">
-                    <h4 className="font-semibold capitalize">{meal}</h4>
+                  <div key={meal} className="space-y-3">
+                    <h4 className="font-semibold text-sm flex items-center gap-2">
+                      <span>{mealEmojis[meal as keyof typeof mealEmojis]}</span>
+                      <span className="capitalize">{meal}</span>
+                    </h4>
                     {mealEntries.map((entry) => (
-                      <div key={entry.id} className="flex justify-between items-center p-2 border rounded">
-                        <div>
-                          <div className="font-medium">{entry.food_name}</div>
-                          <div className="text-xs text-muted-foreground">
+                      <div key={entry.id} className="flex justify-between items-center p-3 bg-card border rounded-lg">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{entry.food_name}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
                             P: {entry.protein_g}g • C: {entry.carbs_g}g • F: {entry.fat_g}g
                           </div>
                         </div>
-                        <Badge variant="outline">{entry.total_calories} cal</Badge>
+                        <Badge variant="secondary" className="px-3 py-1 font-medium">
+                          {entry.total_calories} cal
+                        </Badge>
                       </div>
                     ))}
                   </div>

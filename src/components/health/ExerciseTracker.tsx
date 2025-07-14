@@ -188,204 +188,231 @@ export function ExerciseTracker() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Dumbbell className="h-5 w-5" />
-              Log Exercise
-            </CardTitle>
-            <CardDescription>Record your workout sessions</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="exercise-name">Exercise Name</Label>
+    <div className="space-y-6 px-4 pb-6">
+      {/* Log Exercise Card */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Dumbbell className="h-5 w-5 text-primary" />
+            </div>
+            Log Exercise
+          </CardTitle>
+          <CardDescription className="text-sm">Record your workout sessions</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Exercise Name */}
+          <div className="space-y-2">
+            <Label htmlFor="exercise-name" className="text-sm font-medium">Exercise Name</Label>
+            <Input
+              id="exercise-name"
+              placeholder="e.g., Push-ups, Running, Yoga"
+              value={exerciseName}
+              onChange={(e) => setExerciseName(e.target.value)}
+              className="h-12"
+            />
+          </div>
+
+          {/* Type and Intensity */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="exercise-type" className="text-sm font-medium">Type</Label>
+              <Select value={exerciseType} onValueChange={setExerciseType}>
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cardio">🏃 Cardio</SelectItem>
+                  <SelectItem value="strength">💪 Strength</SelectItem>
+                  <SelectItem value="flexibility">🧘 Flexibility</SelectItem>
+                  <SelectItem value="sports">⚽ Sports</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="intensity" className="text-sm font-medium">Intensity</Label>
+              <Select value={intensity} onValueChange={setIntensity}>
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Select intensity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">🟢 Low</SelectItem>
+                  <SelectItem value="moderate">🟡 Moderate</SelectItem>
+                  <SelectItem value="high">🔴 High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Duration and Calories */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="duration" className="text-sm font-medium">Duration (min)</Label>
               <Input
-                id="exercise-name"
-                placeholder="e.g., Push-ups, Running, Yoga"
-                value={exerciseName}
-                onChange={(e) => setExerciseName(e.target.value)}
+                id="duration"
+                type="number"
+                placeholder="30"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                className="h-12 text-center"
               />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="exercise-type">Type</Label>
-                <Select value={exerciseType} onValueChange={setExerciseType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cardio">Cardio</SelectItem>
-                    <SelectItem value="strength">Strength</SelectItem>
-                    <SelectItem value="flexibility">Flexibility</SelectItem>
-                    <SelectItem value="sports">Sports</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="intensity">Intensity</Label>
-                <Select value={intensity} onValueChange={setIntensity}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select intensity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="moderate">Moderate</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="duration">Duration (min)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  placeholder="30"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="calories">Calories (optional)</Label>
-                <Input
-                  id="calories"
-                  type="number"
-                  placeholder="300"
-                  value={calories}
-                  onChange={(e) => setCalories(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="notes">Notes (optional)</Label>
-              <Textarea
-                id="notes"
-                placeholder="How did the workout feel?"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+            <div className="space-y-2">
+              <Label htmlFor="calories" className="text-sm font-medium">Calories (optional)</Label>
+              <Input
+                id="calories"
+                type="number"
+                placeholder="300"
+                value={calories}
+                onChange={(e) => setCalories(e.target.value)}
+                className="h-12 text-center"
               />
             </div>
+          </div>
 
-            <Button 
-              onClick={addExerciseRecord} 
-              disabled={!exerciseName || !exerciseType || !duration || !intensity || isLoading}
-              className="w-full"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Log Exercise
-            </Button>
-          </CardContent>
-        </Card>
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="text-sm font-medium">Notes (optional)</Label>
+            <Textarea
+              id="notes"
+              placeholder="How did the workout feel?"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="min-h-[80px] resize-none"
+            />
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Daily Steps
-            </CardTitle>
-            <CardDescription>Track your daily step count</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold">
-                {todaySteps?.steps.toLocaleString() || 0}
-              </div>
-              <p className="text-sm text-muted-foreground">steps today</p>
+          {/* Log Button */}
+          <Button 
+            onClick={addExerciseRecord} 
+            disabled={!exerciseName || !exerciseType || !duration || !intensity || isLoading}
+            className="w-full h-12 text-base font-medium"
+            size="lg"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Log Exercise
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Daily Steps Card */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Activity className="h-5 w-5 text-primary" />
             </div>
-
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span>Daily Goal</span>
-                <span>{todaySteps?.steps || 0}/10,000</span>
-              </div>
-              <Progress value={getStepProgress()} className="h-2" />
+            Daily Steps
+          </CardTitle>
+          <CardDescription className="text-sm">Track your daily step count</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Current Steps Display */}
+          <div className="text-center py-4 bg-muted/50 rounded-lg">
+            <div className="text-4xl font-bold text-primary">
+              {todaySteps?.steps.toLocaleString() || 0}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">steps today</p>
+          </div>
 
-            <div>
-              <Label htmlFor="steps">Update Steps</Label>
+          {/* Progress */}
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Daily Goal Progress</span>
+              <span className="font-medium">{todaySteps?.steps || 0}/10,000</span>
+            </div>
+            <Progress value={getStepProgress()} className="h-3" />
+          </div>
+
+          {/* Update Steps */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="steps" className="text-sm font-medium">Update Steps</Label>
               <Input
                 id="steps"
                 type="number"
                 placeholder="8432"
                 value={steps}
                 onChange={(e) => setSteps(e.target.value)}
+                className="h-12 text-center text-lg"
               />
             </div>
 
             <Button 
               onClick={updateSteps} 
               disabled={!steps || isLoading}
-              className="w-full"
+              className="w-full h-12 text-base font-medium"
+              size="lg"
             >
-              <Activity className="h-4 w-4 mr-2" />
+              <Activity className="h-5 w-5 mr-2" />
               Update Steps
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            Weekly Exercise Summary
+      {/* Weekly Summary Card */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Target className="h-5 w-5 text-primary" />
+            </div>
+            Weekly Summary
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span>Weekly Exercise Goal</span>
-                <span>{getWeeklyExerciseMinutes()}/{weeklyExerciseGoal} min</span>
-              </div>
-              <Progress value={getExerciseProgress()} className="h-2" />
+        <CardContent className="space-y-6">
+          {/* Weekly Goal Progress */}
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Weekly Exercise Goal</span>
+              <span className="font-medium">{getWeeklyExerciseMinutes()}/{weeklyExerciseGoal} min</span>
             </div>
+            <Progress value={getExerciseProgress()} className="h-3" />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold">{getWeeklyExerciseMinutes()}</div>
-                <p className="text-sm text-muted-foreground">Minutes This Week</p>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{exerciseRecords.length}</div>
-                <p className="text-sm text-muted-foreground">Workouts</p>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{Math.round(getWeeklyCaloriesBurned())}</div>
-                <p className="text-sm text-muted-foreground">Calories Burned</p>
-              </div>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold text-primary">{getWeeklyExerciseMinutes()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Minutes</p>
             </div>
+            <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold text-primary">{exerciseRecords.length}</div>
+              <p className="text-xs text-muted-foreground mt-1">Workouts</p>
+            </div>
+            <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold text-primary">{Math.round(getWeeklyCaloriesBurned())}</div>
+              <p className="text-xs text-muted-foreground mt-1">Calories</p>
+            </div>
+          </div>
 
-            {exerciseRecords.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-semibold">Recent Workouts</h4>
-                {exerciseRecords.slice(0, 3).map((record) => (
-                  <div key={record.id} className="flex justify-between items-center p-2 border rounded">
-                    <div>
-                      <div className="font-medium">{record.exercise_name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {record.exercise_type} • {record.intensity} intensity
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant="outline">{record.duration_minutes} min</Badge>
-                      {record.calories_burned > 0 && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {record.calories_burned} cal
-                        </div>
-                      )}
+          {/* Recent Workouts */}
+          {exerciseRecords.length > 0 && (
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Recent Workouts</h4>
+              {exerciseRecords.slice(0, 3).map((record) => (
+                <div key={record.id} className="flex justify-between items-center p-3 bg-card border rounded-lg">
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">{record.exercise_name}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {record.exercise_type} • {record.intensity} intensity
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <div className="text-right">
+                    <Badge variant="secondary" className="px-3 py-1 font-medium">
+                      {record.duration_minutes} min
+                    </Badge>
+                    {record.calories_burned > 0 && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {record.calories_burned} cal
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -162,144 +162,168 @@ export function HealthProfile() {
   const bmiInfo = getBMICategory(bmi);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5" />
-          Health Profile
-        </CardTitle>
-        <CardDescription>
-          Set up your profile to get personalized nutrition and fitness recommendations
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="gender">Gender</Label>
-            <Select value={profile.gender} onValueChange={(value) => setProfile({...profile, gender: value})}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select gender" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="birth-date">Birth Date</Label>
-            <Input
-              id="birth-date"
-              type="date"
-              value={profile.birth_date}
-              onChange={(e) => setProfile({...profile, birth_date: e.target.value})}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <Label htmlFor="height">Height (cm)</Label>
-            <Input
-              id="height"
-              type="number"
-              placeholder="170"
-              value={profile.height_cm || ''}
-              onChange={(e) => setProfile({...profile, height_cm: Number(e.target.value)})}
-            />
-          </div>
-          <div>
-            <Label htmlFor="weight">Current Weight (kg)</Label>
-            <Input
-              id="weight"
-              type="number"
-              step="0.1"
-              placeholder="70.0"
-              value={profile.weight_kg || ''}
-              onChange={(e) => setProfile({...profile, weight_kg: Number(e.target.value)})}
-            />
-          </div>
-          <div>
-            <Label htmlFor="target-weight">Target Weight (kg)</Label>
-            <Input
-              id="target-weight"
-              type="number"
-              step="0.1"
-              placeholder="65.0"
-              value={profile.target_weight_kg || ''}
-              onChange={(e) => setProfile({...profile, target_weight_kg: Number(e.target.value)})}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="goal-type">Goal</Label>
-            <Select value={profile.goal_type} onValueChange={(value) => setProfile({...profile, goal_type: value})}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select goal" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="lose">Lose Weight</SelectItem>
-                <SelectItem value="maintain">Maintain Weight</SelectItem>
-                <SelectItem value="gain">Gain Weight</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="activity-level">Activity Level</Label>
-            <Select value={profile.activity_level} onValueChange={(value) => setProfile({...profile, activity_level: value})}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select activity level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sedentary">Sedentary (little/no exercise)</SelectItem>
-                <SelectItem value="light">Light (light exercise 1-3 days/week)</SelectItem>
-                <SelectItem value="moderate">Moderate (moderate exercise 3-5 days/week)</SelectItem>
-                <SelectItem value="active">Active (hard exercise 6-7 days/week)</SelectItem>
-                <SelectItem value="very_active">Very Active (very hard exercise & physical job)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {bmi > 0 && (
-          <div className="p-4 bg-muted rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Calculator className="h-4 w-4" />
-              <span className="font-semibold">Health Metrics</span>
+    <div className="px-4 pb-6">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <User className="h-5 w-5 text-primary" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-xl font-bold">BMI: {bmi}</div>
-                <div className={`text-sm ${bmiInfo.color}`}>{bmiInfo.category}</div>
+            Health Profile
+          </CardTitle>
+          <CardDescription className="text-sm">
+            Set up your profile to get personalized nutrition and fitness recommendations
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Basic Info */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="gender" className="text-sm font-medium">Gender</Label>
+              <Select value={profile.gender} onValueChange={(value) => setProfile({...profile, gender: value})}>
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">👨 Male</SelectItem>
+                  <SelectItem value="female">👩 Female</SelectItem>
+                  <SelectItem value="other">🧑 Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="birth-date" className="text-sm font-medium">Birth Date</Label>
+              <Input
+                id="birth-date"
+                type="date"
+                value={profile.birth_date}
+                onChange={(e) => setProfile({...profile, birth_date: e.target.value})}
+                className="h-12"
+              />
+            </div>
+          </div>
+
+          {/* Body Measurements */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Body Measurements</h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="height" className="text-sm font-medium">Height (cm)</Label>
+                <Input
+                  id="height"
+                  type="number"
+                  placeholder="170"
+                  value={profile.height_cm || ''}
+                  onChange={(e) => setProfile({...profile, height_cm: Number(e.target.value)})}
+                  className="h-12 text-center text-lg"
+                />
               </div>
-              <div>
-                <div className="text-xl font-bold">{calculateBMR()}</div>
-                <div className="text-sm text-muted-foreground">Estimated Daily Calories</div>
-              </div>
-              <div>
-                <div className="text-xl font-bold">
-                  {profile.target_weight_kg > 0 ? Math.abs(profile.weight_kg - profile.target_weight_kg).toFixed(1) : 0}kg
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="weight" className="text-sm font-medium">Current Weight (kg)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    step="0.1"
+                    placeholder="70.0"
+                    value={profile.weight_kg || ''}
+                    onChange={(e) => setProfile({...profile, weight_kg: Number(e.target.value)})}
+                    className="h-12 text-center text-lg"
+                  />
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {profile.target_weight_kg > profile.weight_kg ? 'To Gain' : 'To Lose'}
+                <div className="space-y-2">
+                  <Label htmlFor="target-weight" className="text-sm font-medium">Target Weight (kg)</Label>
+                  <Input
+                    id="target-weight"
+                    type="number"
+                    step="0.1"
+                    placeholder="65.0"
+                    value={profile.target_weight_kg || ''}
+                    onChange={(e) => setProfile({...profile, target_weight_kg: Number(e.target.value)})}
+                    className="h-12 text-center text-lg"
+                  />
                 </div>
               </div>
             </div>
           </div>
-        )}
 
-        <Button 
-          onClick={saveProfile} 
-          disabled={!profile.height_cm || !profile.weight_kg || !profile.gender || !profile.birth_date || isLoading}
-          className="w-full"
-        >
-          <Save className="h-4 w-4 mr-2" />
-          {hasProfile ? 'Update Profile' : 'Save Profile'}
-        </Button>
-      </CardContent>
-    </Card>
+          {/* Goals & Activity */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Goals & Activity</h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="goal-type" className="text-sm font-medium">Goal</Label>
+                <Select value={profile.goal_type} onValueChange={(value) => setProfile({...profile, goal_type: value})}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Select goal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lose">📉 Lose Weight</SelectItem>
+                    <SelectItem value="maintain">⚖️ Maintain Weight</SelectItem>
+                    <SelectItem value="gain">📈 Gain Weight</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="activity-level" className="text-sm font-medium">Activity Level</Label>
+                <Select value={profile.activity_level} onValueChange={(value) => setProfile({...profile, activity_level: value})}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Select activity level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sedentary">🛋️ Sedentary</SelectItem>
+                    <SelectItem value="light">🚶 Light Activity</SelectItem>
+                    <SelectItem value="moderate">🏃 Moderate Activity</SelectItem>
+                    <SelectItem value="active">💪 Very Active</SelectItem>
+                    <SelectItem value="very_active">🔥 Extremely Active</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Health Metrics */}
+          {bmi > 0 && (
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-4">
+                <Calculator className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-sm">Health Metrics</span>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-3 bg-card rounded-lg">
+                    <div className="text-lg font-bold text-primary">BMI: {bmi}</div>
+                    <div className={`text-xs ${bmiInfo.color} mt-1`}>{bmiInfo.category}</div>
+                  </div>
+                  <div className="text-center p-3 bg-card rounded-lg">
+                    <div className="text-lg font-bold text-primary">{calculateBMR()}</div>
+                    <div className="text-xs text-muted-foreground mt-1">Daily Calories</div>
+                  </div>
+                  <div className="text-center p-3 bg-card rounded-lg">
+                    <div className="text-lg font-bold text-primary">
+                      {profile.target_weight_kg > 0 ? Math.abs(profile.weight_kg - profile.target_weight_kg).toFixed(1) : 0}kg
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {profile.target_weight_kg > profile.weight_kg ? 'To Gain' : 'To Lose'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Save Button */}
+          <Button 
+            onClick={saveProfile} 
+            disabled={!profile.height_cm || !profile.weight_kg || !profile.gender || !profile.birth_date || isLoading}
+            className="w-full h-12 text-base font-medium"
+            size="lg"
+          >
+            <Save className="h-5 w-5 mr-2" />
+            {hasProfile ? 'Update Profile' : 'Save Profile'}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

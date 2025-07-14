@@ -136,116 +136,139 @@ export function SleepTracker() {
   };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Moon className="h-5 w-5" />
+    <div className="space-y-6 px-4 pb-6">
+      {/* Log Sleep Card */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Moon className="h-5 w-5 text-primary" />
+            </div>
             Sleep Tracker
           </CardTitle>
-          <CardDescription>Track your sleep patterns and quality</CardDescription>
+          <CardDescription className="text-sm">Track your sleep patterns and quality</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="bedtime">Bedtime</Label>
+        <CardContent className="space-y-6">
+          {/* Time Inputs */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="bedtime" className="text-sm font-medium">Bedtime</Label>
               <Input
                 id="bedtime"
                 type="time"
                 value={bedtime}
                 onChange={(e) => setBedtime(e.target.value)}
+                className="h-12 text-lg"
               />
             </div>
-            <div>
-              <Label htmlFor="wake-time">Wake Time</Label>
+            <div className="space-y-2">
+              <Label htmlFor="wake-time" className="text-sm font-medium">Wake Time</Label>
               <Input
                 id="wake-time"
                 type="time"
                 value={wakeTime}
                 onChange={(e) => setWakeTime(e.target.value)}
+                className="h-12 text-lg"
               />
             </div>
           </div>
 
-          <div>
-            <Label>Sleep Quality (1-10)</Label>
-            <Input
-              type="range"
-              min="1"
-              max="10"
-              value={sleepQuality}
-              onChange={(e) => setSleepQuality(Number(e.target.value))}
-              className="mt-2"
-            />
-            <div className="text-center mt-1">
-              <Badge variant="outline">{sleepQuality}/10</Badge>
+          {/* Sleep Quality Slider */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Sleep Quality</Label>
+            <div className="px-3">
+              <Input
+                type="range"
+                min="1"
+                max="10"
+                value={sleepQuality}
+                onChange={(e) => setSleepQuality(Number(e.target.value))}
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>Poor</span>
+                <Badge variant="secondary" className="px-3 py-1">{sleepQuality}/10</Badge>
+                <span>Excellent</span>
+              </div>
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="notes">Notes (optional)</Label>
+          {/* Duration Display */}
+          {bedtime && wakeTime && (
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+              <div className="flex items-center justify-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                <span className="font-medium text-primary">
+                  Duration: {calculateSleepDuration(bedtime, wakeTime)} hours
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="text-sm font-medium">Notes (optional)</Label>
             <Textarea
               id="notes"
               placeholder="How did you sleep? Any disturbances?"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+              className="min-h-[80px] resize-none"
             />
           </div>
 
-          {bedtime && wakeTime && (
-            <div className="text-center">
-              <Badge className="bg-primary text-primary-foreground">
-                <Clock className="h-3 w-3 mr-1" />
-                Duration: {calculateSleepDuration(bedtime, wakeTime)} hours
-              </Badge>
-            </div>
-          )}
-
+          {/* Log Button */}
           <Button 
             onClick={logSleep} 
             disabled={!bedtime || !wakeTime || isLoading}
-            className="w-full"
+            className="w-full h-12 text-base font-medium"
+            size="lg"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-5 w-5 mr-2" />
             Log Sleep
           </Button>
         </CardContent>
       </Card>
 
+      {/* Sleep Summary Card */}
       {sleepRecords.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Sleep Summary</CardTitle>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">Sleep Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{getAverageSleep()}h</div>
-                <p className="text-sm text-muted-foreground">Average Sleep</p>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">{getAverageSleep()}h</div>
+                <p className="text-xs text-muted-foreground mt-1">Avg Sleep</p>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{getAverageQuality()}/10</div>
-                <p className="text-sm text-muted-foreground">Average Quality</p>
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">{getAverageQuality()}/10</div>
+                <p className="text-xs text-muted-foreground mt-1">Avg Quality</p>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{sleepRecords.length}</div>
-                <p className="text-sm text-muted-foreground">Records</p>
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">{sleepRecords.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Records</p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <h4 className="font-semibold">Recent Sleep Records</h4>
+            {/* Recent Records */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Recent Sleep Records</h4>
               {sleepRecords.slice(0, 3).map((record) => (
-                <div key={record.id} className="flex justify-between items-center p-2 border rounded">
-                  <div>
-                    <div className="text-sm">
+                <div key={record.id} className="flex justify-between items-center p-3 bg-card border rounded-lg">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">
                       {new Date(record.created_at).toLocaleDateString()}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {record.sleep_duration_hours}h • Quality: {record.sleep_quality}/10
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Quality: {record.sleep_quality}/10
                     </div>
                   </div>
-                  <Badge variant="outline">{record.sleep_duration_hours}h</Badge>
+                  <Badge variant="outline" className="px-3 py-1 font-medium">
+                    {record.sleep_duration_hours}h
+                  </Badge>
                 </div>
               ))}
             </div>
