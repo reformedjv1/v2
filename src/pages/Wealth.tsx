@@ -1,248 +1,331 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Navigation } from "@/components/Navigation";
 import { 
-  DollarSign, 
+  Activity, 
+  Moon, 
+  Utensils, 
+  Dumbbell, 
+  Brain, 
   TrendingUp, 
-  PiggyBank, 
-  CreditCard, 
+  Plus, 
+  Calendar,
   Target,
-  Plus,
+  Zap,
+  Heart,
+  BarChart3,
+  Settings,
+  Home,
+  DollarSign,
+  PiggyBank,
+  Wallet,
   ArrowUpRight,
-  ArrowDownRight,
-  Wallet
+  CreditCard,
+  TrendingDown
 } from 'lucide-react';
 
 export default function Wealth() {
-  const [netWorth] = useState(127000);
-  const [monthlyIncome] = useState(6500);
-  const [monthlyExpenses] = useState(4200);
-  const [savingsRate] = useState(35);
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const financialMetrics = [
-    {
-      title: 'Net Worth',
-      value: netWorth,
-      unit: '',
-      icon: Wallet,
-      color: 'text-green-500',
-      trend: '+24%',
-      prefix: '$'
-    },
-    {
-      title: 'Monthly Income',
-      value: monthlyIncome,
-      unit: '',
-      icon: ArrowUpRight,
-      color: 'text-blue-500',
-      trend: '+12%',
-      prefix: '$'
-    },
-    {
-      title: 'Savings Rate',
-      value: savingsRate,
-      unit: '%',
-      icon: PiggyBank,
-      color: 'text-purple-500',
-      trend: '+8%',
-      prefix: ''
-    }
+  const wealthMetrics = [
+    { label: 'Net Worth', value: 127000, unit: '', icon: Wallet, color: 'bg-green-500', trend: '+24%', prefix: '$' },
+    { label: 'Monthly Income', value: 6500, unit: '', icon: ArrowUpRight, color: 'bg-blue-500', trend: '+12%', prefix: '$' },
+    { label: 'Savings Rate', value: 35, unit: '%', icon: PiggyBank, color: 'bg-purple-500', trend: '+8%', prefix: '' },
+    { label: 'Investment Growth', value: 12.4, unit: '%', icon: TrendingUp, color: 'bg-orange-500', trend: '+2.1%', prefix: '+' }
+  ];
+
+  const quickActions = [
+    { label: 'Add Transaction', icon: Plus, action: () => {} },
+    { label: 'Pay Bills', icon: CreditCard, action: () => {} },
+    { label: 'Transfer Savings', icon: PiggyBank, action: () => {} },
+    { label: 'Invest Funds', icon: TrendingUp, action: () => {} }
+  ];
+
+  const navItems = [
+    { label: 'Overview', value: 'overview', icon: BarChart3 },
+    { label: 'Investments', value: 'investments', icon: TrendingUp },
+    { label: 'Expenses', value: 'expenses', icon: CreditCard },
+    { label: 'Goals', value: 'goals', icon: Target }
   ];
 
   const investments = [
-    { name: 'S&P 500 ETF', value: 45000, allocation: 60, change: '+12.4%' },
-    { name: 'International ETF', value: 22500, allocation: 30, change: '+8.7%' },
-    { name: 'Bonds ETF', value: 7500, allocation: 10, change: '+3.2%' }
+    { name: '📈 S&P 500 ETF', value: 45000, allocation: 60, change: '+12.4%', positive: true },
+    { name: '🌍 International ETF', value: 22500, allocation: 30, change: '+8.7%', positive: true },
+    { name: '🏦 Bonds ETF', value: 7500, allocation: 10, change: '+3.2%', positive: true }
   ];
 
   const expenses = [
-    { category: 'Housing', amount: 1800, percentage: 43, icon: '🏠' },
-    { category: 'Food', amount: 800, percentage: 19, icon: '🍽️' },
-    { category: 'Transportation', amount: 400, percentage: 10, icon: '🚗' },
-    { category: 'Entertainment', amount: 300, percentage: 7, icon: '🎬' },
-    { category: 'Other', amount: 900, percentage: 21, icon: '📦' }
+    { category: '🏠 Housing', amount: 1800, percentage: 43 },
+    { category: '🍽️ Food', amount: 800, percentage: 19 },
+    { category: '🚗 Transportation', amount: 400, percentage: 10 },
+    { category: '🎬 Entertainment', amount: 300, percentage: 7 },
+    { category: '📦 Other', amount: 900, percentage: 21 }
   ];
 
   const goals = [
-    { name: 'Emergency Fund', target: 25000, current: 18000, progress: 72 },
-    { name: 'House Down Payment', target: 50000, current: 32000, progress: 64 },
-    { name: 'Retirement Fund', target: 1000000, current: 75000, progress: 7.5 }
+    { name: '🚨 Emergency Fund', target: 25000, current: 18000, progress: 72 },
+    { name: '🏡 House Down Payment', target: 50000, current: 32000, progress: 64 },
+    { name: '👴 Retirement Fund', target: 1000000, current: 75000, progress: 7.5 }
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <main className="container mx-auto px-4 py-6 max-w-6xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Wealth Dashboard</h1>
-          <p className="text-muted-foreground">Build generational wealth through science-backed strategies</p>
+    <div className="min-h-screen bg-background pb-24">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/20">
+        <div className="flex items-center justify-between p-4">
+          <div>
+            <h1 className="text-xl font-bold">Wealth 💎</h1>
+            <p className="text-sm text-muted-foreground">Sunday, Dec 15</p>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" className="h-10 w-10 p-0">
+              <Calendar className="h-4 w-4" />
+            </Button>
+            <Button size="sm" variant="ghost" className="h-10 w-10 p-0">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+      </div>
 
-        {/* Metrics Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {financialMetrics.map((metric, index) => (
-            <Card key={index}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <metric.icon className={`h-5 w-5 ${metric.color}`} />
-                  <Badge variant="secondary" className="text-xs">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    {metric.trend}
-                  </Badge>
+      <div className="p-4 space-y-6">
+        {/* Daily Score */}
+        <Card className="wealth-gradient text-white overflow-hidden">
+          <CardContent className="p-6 relative">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-white/80 text-sm">Today's Wealth Score</p>
+                <h2 className="text-3xl font-bold">91</h2>
+              </div>
+              <div className="text-right">
+                <div className="flex items-center gap-1 text-white/90">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="text-sm">+7 from yesterday</span>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">{metric.title}</p>
-                  <div className="text-2xl font-bold">
-                    {metric.prefix}{metric.value.toLocaleString()}<span className="text-sm font-normal">{metric.unit}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="investments">Investments</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="goals">Goals</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5" />
-                    Monthly Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Income</span>
-                    <span className="font-semibold text-green-600">${monthlyIncome.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Expenses</span>
-                    <span className="font-semibold text-red-600">-${monthlyExpenses.toLocaleString()}</span>
-                  </div>
-                  <hr />
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold">Net Income</span>
-                    <span className="font-bold text-green-600">${(monthlyIncome - monthlyExpenses).toLocaleString()}</span>
-                  </div>
-                  <div className="pt-2">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Savings Rate</span>
-                      <span>{savingsRate}%</span>
-                    </div>
-                    <Progress value={savingsRate} className="h-2" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Quick Actions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button className="w-full justify-start" variant="outline">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Transaction
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Pay Bills
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <PiggyBank className="h-4 w-4 mr-2" />
-                    Transfer to Savings
-                  </Button>
-                </CardContent>
-              </Card>
+                <p className="text-xs text-white/70 mt-1">Excellent growth</p>
+              </div>
             </div>
-          </TabsContent>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-white/80">
+                <span>Financial wellness</span>
+                <span>91%</span>
+              </div>
+              <Progress value={91} className="h-2 bg-white/20" />
+            </div>
+          </CardContent>
+        </Card>
 
-          <TabsContent value="investments" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {investments.map((investment, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{investment.name}</CardTitle>
-                    <CardDescription>{investment.allocation}% allocation</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 mb-4">
-                      <div className="text-2xl font-bold">${investment.value.toLocaleString()}</div>
-                      <Badge variant={investment.change.startsWith('+') ? 'default' : 'destructive'}>
+        {/* Wealth Metrics Grid */}
+        <div className="grid grid-cols-2 gap-3">
+          {wealthMetrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <Card key={index} className="metric-card">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`w-8 h-8 rounded-lg ${metric.color} flex items-center justify-center`}>
+                      <Icon className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-xs text-green-600 font-medium">{metric.trend}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-1">{metric.label}</p>
+                  <p className="text-lg font-bold">
+                    {metric.prefix}{metric.value.toLocaleString()}<span className="text-sm font-normal text-muted-foreground">{metric.unit}</span>
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Today's Goals */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold">Today's Financial Goals</h3>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Daily spending limit</span>
+                  <span>$85 / $100</span>
+                </div>
+                <Progress value={85} className="h-2" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Investment allocation</span>
+                  <span>$500 / $500</span>
+                </div>
+                <Progress value={100} className="h-2" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Savings target</span>
+                  <span>$1,200 / $1,500</span>
+                </div>
+                <Progress value={80} className="h-2" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="font-semibold mb-4">Quick Actions</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {quickActions.map((action, index) => {
+                const Icon = action.icon;
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className="action-button flex-col gap-2 h-16"
+                    onClick={action.action}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-xs">{action.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Investments Overview */}
+        {activeTab === 'investments' && (
+          <Card>
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-4">Investment Portfolio</h3>
+              <div className="space-y-3">
+                {investments.map((investment, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <span className="text-sm">{investment.name.split(' ')[0]}</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{investment.name.split(' ').slice(1).join(' ')}</p>
+                      <p className="text-xs text-muted-foreground">${investment.value.toLocaleString()} • {investment.allocation}%</p>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-xs font-medium ${investment.positive ? 'text-green-600' : 'text-red-600'}`}>
                         {investment.change}
-                      </Badge>
-                    </div>
-                    <Progress value={investment.allocation} className="h-2 mb-3" />
-                    <Button className="w-full" variant="outline">
-                      View Details
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="expenses" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {expenses.map((expense, index) => (
-                <Card key={index}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{expense.icon}</span>
-                      <Badge variant="outline">{expense.percentage}%</Badge>
-                    </div>
-                    <h4 className="font-semibold mb-1">{expense.category}</h4>
-                    <p className="text-2xl font-bold mb-3">${expense.amount}</p>
-                    <Progress value={expense.percentage} className="h-2" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="goals" className="space-y-4">
-            <div className="space-y-4">
-              {goals.map((goal, index) => (
-                <Card key={index}>
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h4 className="font-semibold">{goal.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          ${goal.current.toLocaleString()} of ${goal.target.toLocaleString()}
-                        </p>
                       </div>
-                      <Badge variant="secondary">{goal.progress}%</Badge>
                     </div>
-                    <Progress value={goal.progress} className="h-3 mb-3" />
-                    <div className="flex justify-between text-sm">
-                      <span>${(goal.target - goal.current).toLocaleString()} remaining</span>
-                      <Button size="sm" variant="outline">
-                        Adjust Goal
-                      </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Expenses Overview */}
+        {activeTab === 'expenses' && (
+          <Card>
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-4">Monthly Expenses</h3>
+              <div className="space-y-3">
+                {expenses.map((expense, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <span className="text-sm">{expense.category.split(' ')[0]}</span>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{expense.category.split(' ').slice(1).join(' ')}</p>
+                      <p className="text-xs text-muted-foreground">${expense.amount} • {expense.percentage}%</p>
+                    </div>
+                    <div className="w-16">
+                      <Progress value={expense.percentage} className="h-1" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Goals Overview */}
+        {activeTab === 'goals' && (
+          <Card>
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-4">Financial Goals</h3>
+              <div className="space-y-4">
+                {goals.map((goal, index) => (
+                  <div key={index} className="p-3 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-sm">{goal.name}</h4>
+                      <span className="text-xs font-medium">{goal.progress}%</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      ${goal.current.toLocaleString()} of ${goal.target.toLocaleString()}
+                    </p>
+                    <Progress value={goal.progress} className="h-2 mb-2" />
+                    <div className="text-xs text-muted-foreground">
+                      ${(goal.target - goal.current).toLocaleString()} remaining
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Overview Summary */}
+        {activeTab === 'overview' && (
+          <Card>
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-4">Monthly Summary</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Income</span>
+                  <span className="font-semibold text-green-600">+$6,500</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Expenses</span>
+                  <span className="font-semibold text-red-600">-$4,200</span>
+                </div>
+                <hr />
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold">Net Income</span>
+                  <span className="font-bold text-green-600">+$2,300</span>
+                </div>
+                <div className="pt-2">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Savings Rate</span>
+                    <span>35%</span>
+                  </div>
+                  <Progress value={35} className="h-2" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="floating-nav">
+        <div className="flex items-center justify-around p-3">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.value;
+            return (
+              <Button
+                key={item.value}
+                variant="ghost"
+                size="sm"
+                className={`flex flex-col gap-1 h-12 px-3 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
+                onClick={() => setActiveTab(item.value)}
+              >
+                <Icon className="h-4 w-4" />
+                <span className="text-xs">{item.label}</span>
+              </Button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

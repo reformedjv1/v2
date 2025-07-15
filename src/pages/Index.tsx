@@ -39,9 +39,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      
+    <div className="min-h-screen pb-24">
       <main className="px-4 py-6 sm:px-6 max-w-6xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-8 sm:mb-12">
@@ -155,6 +153,8 @@ const Index = () => {
           </p>
         </div>
       </main>
+      
+      <Navigation />
     </div>
   );
 };
