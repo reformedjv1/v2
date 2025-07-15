@@ -224,14 +224,13 @@ export default function Health() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* iOS-style Segmented Control */}
-          <div className="ios-segmented mb-6">
+          <TabsList className="ios-segmented mb-6">
             <TabsTrigger value="overview" className="ios-segment">Overview</TabsTrigger>
             <TabsTrigger value="profile" className="ios-segment">Profile</TabsTrigger>
             <TabsTrigger value="nutrition" className="ios-segment">Nutrition</TabsTrigger>
             <TabsTrigger value="fitness" className="ios-segment">Fitness</TabsTrigger>
             <TabsTrigger value="sleep" className="ios-segment">Sleep</TabsTrigger>
-          </div>
+          </TabsList>
 
           <TabsContent value="overview" className="mt-0">
             {renderOverview()}

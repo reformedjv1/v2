@@ -271,13 +271,12 @@ export default function Relations() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* iOS-style Segmented Control */}
-          <div className="ios-segmented mb-6">
+          <TabsList className="ios-segmented mb-6">
             <TabsTrigger value="overview" className="ios-segment">Overview</TabsTrigger>
             <TabsTrigger value="connections" className="ios-segment">Connections</TabsTrigger>
             <TabsTrigger value="activities" className="ios-segment">Activities</TabsTrigger>
             <TabsTrigger value="growth" className="ios-segment">Growth</TabsTrigger>
-          </div>
+          </TabsList>
 
           <TabsContent value="overview" className="mt-0">
             {renderOverview()}
