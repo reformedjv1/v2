@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
-import { Activity, DollarSign, Heart, ArrowUpRight, Sparkles, Target, Brain, ChevronRight, Bell } from "lucide-react";
+import { Activity, DollarSign, Heart, ArrowUpRight, Sparkles, Target, Brain, ChevronRight, Bell, User } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -72,9 +72,19 @@ const Index = () => {
           <div>
             <div className="ios-large-title gradient-text">Trinity</div>
             <p className="text-sm text-muted-foreground">Life Optimization System</p>
-          </div>
-          <Button size="sm" variant="ghost" className="h-10 w-10 p-0 haptic-light">
-            <Bell className="h-5 w-5" />
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" className="h-10 w-10 p-0 haptic-light">
+                <Bell className="h-5 w-5" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="h-10 w-10 p-0 haptic-light"
+                onClick={() => navigate('/profile')}
+              >
+                <User className="h-5 w-5" />
+              </Button>
+            </div>
           </Button>
         </div>
       </div>

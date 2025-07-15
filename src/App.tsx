@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/components/AuthProvider";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import Health from "./pages/Health";
 import Wealth from "./pages/Wealth";
 import Relations from "./pages/Relations";
@@ -62,6 +63,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/health" element={<ProtectedRoute><Health /></ProtectedRoute>} />
             <Route path="/wealth" element={<ProtectedRoute><Wealth /></ProtectedRoute>} />
             <Route path="/relations" element={<ProtectedRoute><Relations /></ProtectedRoute>} />

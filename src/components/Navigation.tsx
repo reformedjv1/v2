@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Activity, DollarSign, Heart, Home } from "lucide-react";
+import { Activity, DollarSign, Heart, Home, User } from "lucide-react";
 
 export const Navigation = () => {
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ export const Navigation = () => {
     { icon: Activity, label: 'Health', href: '/health', emoji: '💚' },
     { icon: DollarSign, label: 'Wealth', href: '/wealth', emoji: '💎' },
     { icon: Heart, label: 'Relations', href: '/relations', emoji: '🤝' },
+    { icon: User, label: 'Profile', href: '/profile', emoji: '👤' },
   ];
 
   const handleNavigation = (href: string) => {
