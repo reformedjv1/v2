@@ -156,8 +156,8 @@ All colors MUST be HSL.
 
 @layer components {
   .glass-card {
-    @apply bg-card/50 backdrop-blur-xl border border-border/50;
-    box-shadow: var(--shadow-soft);
+    @apply bg-card/80 backdrop-blur-xl border border-border/20;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
   
   .gradient-text {
@@ -168,18 +168,34 @@ All colors MUST be HSL.
   }
   
   .glow-effect {
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
   }
   
-  .pillar-health {
-    background: var(--gradient-primary);
+  .health-gradient {
+    background: linear-gradient(135deg, hsl(151 47% 45%), hsl(168 76% 42%));
   }
   
-  .pillar-wealth {
-    background: var(--gradient-secondary);
+  .wealth-gradient {
+    background: linear-gradient(135deg, hsl(217 91% 60%), hsl(262 83% 58%));
   }
   
-  .pillar-relations {
-    background: var(--gradient-tertiary);
+  .relations-gradient {
+    background: linear-gradient(135deg, hsl(31 83% 55%), hsl(14 83% 58%));
+  }
+  
+  .metric-card {
+    @apply bg-card rounded-2xl p-4 border border-border/30 transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .action-button {
+    @apply h-14 rounded-2xl font-medium text-base transition-all duration-200 active:scale-95;
+  }
+  
+  .floating-nav {
+    @apply fixed bottom-4 left-4 right-4 z-50 bg-card/90 backdrop-blur-xl border border-border/30 rounded-2xl shadow-xl;
+  }
+  
+  .status-indicator {
+    @apply w-3 h-3 rounded-full;
   }
 }
