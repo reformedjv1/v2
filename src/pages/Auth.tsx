@@ -96,11 +96,10 @@ export default function Auth() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
-              {/* iOS-style Segmented Control */}
-              <div className="ios-segmented mb-6">
+              <TabsList className="ios-segmented mb-6">
                 <TabsTrigger value="signin" className="ios-segment">Sign In</TabsTrigger>
                 <TabsTrigger value="signup" className="ios-segment">Sign Up</TabsTrigger>
-              </div>
+              </TabsList>
               
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
