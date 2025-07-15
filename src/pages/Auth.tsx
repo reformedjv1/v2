@@ -64,25 +64,31 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 safe-area-top safe-area-bottom safe-area-left safe-area-right">
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold gradient-text mb-3">
             TrinityOS
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm mb-4">
             Optimize Health, Wealth & Relations
           </p>
-          <div className="flex justify-center items-center gap-2 mt-3">
-            <Activity className="h-4 w-4 text-green-500" />
-            <DollarSign className="h-4 w-4 text-blue-500" />
-            <Heart className="h-4 w-4 text-purple-500" />
+          <div className="flex justify-center items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+              <Activity className="h-5 w-5 text-white" />
+            </div>
+            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-white" />
+            </div>
+            <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
+              <Heart className="h-5 w-5 text-white" />
+            </div>
           </div>
         </div>
 
-        <Card>
-          <CardHeader className="space-y-1 text-center">
+        <Card className="glass-card">
+          <CardHeader className="space-y-1 text-center pb-4">
             <CardTitle className="text-2xl">Welcome</CardTitle>
             <CardDescription>
               Sign in to your account or create a new one
@@ -90,10 +96,11 @@ export default function Auth() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
+              {/* iOS-style Segmented Control */}
+              <div className="ios-segmented mb-6">
+                <TabsTrigger value="signin" className="ios-segment">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="ios-segment">Sign Up</TabsTrigger>
+              </div>
               
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
@@ -105,6 +112,7 @@ export default function Auth() {
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      className="ios-input"
                       required
                     />
                   </div>
@@ -116,10 +124,15 @@ export default function Auth() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      className="ios-input"
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button 
+                    type="submit" 
+                    className="ios-button-primary w-full haptic-medium" 
+                    disabled={isLoading}
+                  >
                     {isLoading ? 'Signing in...' : 'Sign In'}
                   </Button>
                 </form>
@@ -127,7 +140,7 @@ export default function Auth() {
               
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="firstname">First Name</Label>
                       <Input
@@ -135,6 +148,7 @@ export default function Auth() {
                         placeholder="John"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
+                        className="ios-input"
                         required
                       />
                     </div>
@@ -145,6 +159,7 @@ export default function Auth() {
                         placeholder="Doe"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
+                        className="ios-input"
                         required
                       />
                     </div>
@@ -157,6 +172,7 @@ export default function Auth() {
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      className="ios-input"
                       required
                     />
                   </div>
@@ -168,10 +184,15 @@ export default function Auth() {
                       placeholder="Create a password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      className="ios-input"
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button 
+                    type="submit" 
+                    className="ios-button-primary w-full haptic-medium" 
+                    disabled={isLoading}
+                  >
                     {isLoading ? 'Creating account...' : 'Create Account'}
                   </Button>
                 </form>

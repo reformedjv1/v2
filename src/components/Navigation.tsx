@@ -1,7 +1,6 @@
-
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Activity, DollarSign, Heart, Home, Settings } from "lucide-react";
+import { Activity, DollarSign, Heart, Home } from "lucide-react";
 
 export const Navigation = () => {
   const navigate = useNavigate();
@@ -18,34 +17,27 @@ export const Navigation = () => {
     navigate(href);
   };
 
-  // Only show navigation on the home page for mobile design
-  if (location.pathname !== '/') {
-    return null;
-  }
-
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/20 md:relative md:border-t-0 md:border-b md:top-0">
-      <div className="flex items-center justify-around p-4 md:justify-center md:space-x-8">
+    <div className="floating-nav">
+      <div className="ios-tab-bar safe-area-left safe-area-right">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.href;
           return (
-            <Button
+            <button
               key={item.label}
-              variant="ghost"
-              size="sm"
-              className={`flex flex-col gap-1 h-12 px-3 md:flex-row md:h-10 md:gap-2 ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`}
+              className={`ios-tab haptic-selection ${isActive ? 'active' : ''}`}
               onClick={() => handleNavigation(item.href)}
             >
-              <span className="text-lg md:hidden">{item.emoji}</span>
-              <Icon className="h-4 w-4 hidden md:block" />
-              <span className="text-xs md:text-sm">{item.label}</span>
-            </Button>
+              <div className="text-xl mb-1">{item.emoji}</div>
+              <span className="text-xs font-medium">{item.label}</span>
+              {isActive && (
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></div>
+              )}
+            </button>
           );
         })}
       </div>
-    </nav>
+    </div>
   );
 };

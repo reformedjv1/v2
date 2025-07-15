@@ -1,9 +1,8 @@
-
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
-import { Activity, DollarSign, Heart, ArrowUpRight, Sparkles, Target, Brain, ChevronRight } from "lucide-react";
+import { Activity, DollarSign, Heart, ArrowUpRight, Sparkles, Target, Brain, ChevronRight, Bell } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -15,8 +14,9 @@ const Index = () => {
       icon: Activity,
       description: 'Optimize your body and mind',
       emoji: '💚',
-      gradient: 'pillar-health',
-      stats: { value: '85%', label: 'Optimized' }
+      gradient: 'health-gradient',
+      stats: { value: '85%', label: 'Optimized', trend: '+5%' },
+      color: 'text-green-500'
     },
     {
       id: 'wealth',
@@ -24,8 +24,9 @@ const Index = () => {
       icon: DollarSign,
       description: 'Build financial freedom',
       emoji: '💎',
-      gradient: 'pillar-wealth',
-      stats: { value: '92%', label: 'Growing' }
+      gradient: 'wealth-gradient',
+      stats: { value: '92%', label: 'Growing', trend: '+12%' },
+      color: 'text-blue-500'
     },
     {
       id: 'relations',
@@ -33,122 +34,167 @@ const Index = () => {
       icon: Heart,
       description: 'Strengthen connections',
       emoji: '🤝',
-      gradient: 'pillar-relations',
-      stats: { value: '78%', label: 'Connected' }
+      gradient: 'relations-gradient',
+      stats: { value: '78%', label: 'Connected', trend: '+8%' },
+      color: 'text-purple-500'
+    }
+  ];
+
+  const todayInsights = [
+    {
+      emoji: '💚',
+      title: 'Sleep Score',
+      description: 'Get 30min more sleep for +15% energy',
+      action: 'Optimize',
+      pillar: 'health'
+    },
+    {
+      emoji: '💎',
+      title: 'Savings Rate',
+      description: 'Increase by 5% to hit your goal faster',
+      action: 'Invest',
+      pillar: 'wealth'
+    },
+    {
+      emoji: '🤝',
+      title: 'Social Score',
+      description: 'Schedule quality time this weekend',
+      action: 'Connect',
+      pillar: 'relations'
     }
   ];
 
   return (
-    <div className="min-h-screen pb-24">
-      <main className="px-4 py-6 sm:px-6 max-w-6xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="mb-4">
-            <h1 className="text-3xl sm:text-5xl font-bold mb-2 gradient-text">
-              Trinity
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground/80 uppercase tracking-wider">
-              Life Optimization System
-            </p>
+    <div className="min-h-screen safe-area-top safe-area-bottom ios-scroll">
+      {/* iOS-style Header */}
+      <div className="ios-header safe-area-left safe-area-right">
+        <div className="flex items-center justify-between w-full px-4">
+          <div>
+            <div className="ios-large-title gradient-text">Trinity</div>
+            <p className="text-sm text-muted-foreground">Life Optimization System</p>
           </div>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed">
-            Transform your life through the trinity of human optimization: Health, Wealth, and Relations
-          </p>
-          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8">
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 text-xs sm:text-sm">
+          <Button size="sm" variant="ghost" className="h-10 w-10 p-0 haptic-light">
+            <Bell className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+
+      <main className="px-4 py-6 safe-area-left safe-area-right pb-32">
+        {/* Hero Section - Optimized for mobile */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="flex items-center gap-1 px-3 py-2 rounded-full bg-primary/10 text-xs">
               <Sparkles className="h-3 w-3" />
               <span>AI-Powered</span>
             </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 text-xs sm:text-sm">
+            <div className="flex items-center gap-1 px-3 py-2 rounded-full bg-primary/10 text-xs">
               <Target className="h-3 w-3" />
               <span>Science-Based</span>
             </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 text-xs sm:text-sm">
-              <Brain className="h-3 w-3" />
-              <span>Personalized</span>
-            </div>
           </div>
+          <p className="text-base text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
+            Transform your life through the trinity of human optimization
+          </p>
         </div>
 
-        {/* Pillars Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
-          {pillars.map((pillar, index) => {
-            const Icon = pillar.icon;
-            return (
-              <Card 
-                key={pillar.id} 
-                className="glass-card group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:glow-effect"
-                onClick={() => navigate(`/${pillar.id}`)}
-              >
-                <CardContent className="p-6 sm:p-8">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${pillar.gradient} flex items-center justify-center text-white text-xl sm:text-2xl shadow-lg`}>
-                      {pillar.emoji}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg sm:text-xl font-bold">{pillar.stats.value}</div>
-                      <div className="text-xs sm:text-sm text-muted-foreground">{pillar.stats.label}</div>
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2 group-hover:gradient-text transition-all">
-                    {pillar.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">
-                    {pillar.description}
-                  </p>
-                  
-                  <div className="flex items-center text-primary group-hover:translate-x-1 transition-transform">
-                    <span className="text-sm font-medium">Optimize now</span>
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Quick Insights */}
-        <Card className="glass-card mb-8 sm:mb-12">
-          <CardContent className="p-6 sm:p-8">
-            <div className="text-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold mb-2">Today's Insights</h2>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Your daily optimization recommendations
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="text-center p-4 rounded-xl bg-primary/5">
-                <div className="text-2xl mb-2">💚</div>
-                <div className="text-sm font-medium mb-1">Sleep Score</div>
-                <div className="text-xs text-muted-foreground">Get 30min more sleep for +15% energy</div>
-              </div>
-              <div className="text-center p-4 rounded-xl bg-primary/5">
-                <div className="text-2xl mb-2">💎</div>
-                <div className="text-sm font-medium mb-1">Savings Rate</div>
-                <div className="text-xs text-muted-foreground">Increase by 5% to hit your goal faster</div>
-              </div>
-              <div className="text-center p-4 rounded-xl bg-primary/5">
-                <div className="text-2xl mb-2">🤝</div>
-                <div className="text-sm font-medium mb-1">Social Score</div>
-                <div className="text-xs text-muted-foreground">Schedule quality time this weekend</div>
+        {/* Overall Score Card */}
+        <Card className="glass-card mb-6 haptic-light">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="text-4xl font-bold gradient-text mb-2">85</div>
+              <p className="text-sm text-muted-foreground mb-4">Overall Trinity Score</p>
+              <div className="flex items-center justify-center gap-1 text-green-600 text-sm">
+                <ArrowUpRight className="h-4 w-4" />
+                <span>+8% from last week</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
+        {/* Pillars Grid - Optimized for mobile */}
+        <div className="space-y-4 mb-8">
+          {pillars.map((pillar, index) => {
+            const Icon = pillar.icon;
+            return (
+              <Card 
+                key={pillar.id} 
+                className="ios-list-item haptic-medium cursor-pointer"
+                onClick={() => navigate(`/${pillar.id}`)}
+              >
+                <div className={`w-12 h-12 rounded-2xl ${pillar.gradient} flex items-center justify-center text-white text-xl shadow-lg mr-4`}>
+                  {pillar.emoji}
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-lg font-semibold">{pillar.title}</h3>
+                    <div className="text-right">
+                      <div className="text-lg font-bold">{pillar.stats.value}</div>
+                      <div className={`text-xs ${pillar.color}`}>{pillar.stats.trend}</div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">{pillar.description}</p>
+                  <div className="text-xs text-muted-foreground">{pillar.stats.label}</div>
+                </div>
+                
+                <ChevronRight className="h-5 w-5 text-muted-foreground ml-2" />
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Today's Insights */}
+        <Card className="ios-card mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Today's Insights</h2>
+            <Brain className="h-5 w-5 text-primary" />
+          </div>
+          
+          <div className="space-y-3">
+            {todayInsights.map((insight, index) => (
+              <div key={index} className="ios-list-item haptic-selection">
+                <div className="text-2xl mr-3">{insight.emoji}</div>
+                <div className="flex-1">
+                  <div className="font-medium text-sm mb-1">{insight.title}</div>
+                  <div className="text-xs text-muted-foreground">{insight.description}</div>
+                </div>
+                <Button size="sm" variant="outline" className="haptic-light">
+                  {insight.action}
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3 mb-8">
+          <Button 
+            className="ios-button-primary haptic-medium h-16 flex-col gap-2"
+            onClick={() => navigate('/health')}
+          >
+            <Activity className="h-5 w-5" />
+            <span className="text-sm">Track Health</span>
+          </Button>
+          <Button 
+            className="ios-button-secondary haptic-medium h-16 flex-col gap-2"
+            onClick={() => navigate('/wealth')}
+          >
+            <DollarSign className="h-5 w-5" />
+            <span className="text-sm">Check Wealth</span>
+          </Button>
+        </div>
+
         {/* CTA Section */}
         <div className="text-center">
           <Button 
             size="lg" 
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300 glow-effect"
+            className="ios-button-primary w-full haptic-heavy"
             onClick={() => navigate('/health')}
           >
-            <ArrowUpRight className="h-4 w-4 mr-2" />
+            <ArrowUpRight className="h-5 w-5 mr-2" />
             Start Your Optimization Journey
           </Button>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-3">
+          <p className="text-xs text-muted-foreground mt-3">
             Begin with a comprehensive health assessment
           </p>
         </div>
