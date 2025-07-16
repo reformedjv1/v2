@@ -271,13 +271,6 @@ export default function Relations() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="overview" className="ios-segment">Overview</TabsTrigger>
-            <TabsTrigger value="connections" className="ios-segment">Connections</TabsTrigger>
-            <TabsTrigger value="activities" className="ios-segment">Activities</TabsTrigger>
-            <TabsTrigger value="growth" className="ios-segment">Growth</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="overview" className="mt-0">
             {renderOverview()}
           </TabsContent>
@@ -293,6 +286,18 @@ export default function Relations() {
           <TabsContent value="growth" className="mt-0">
             {renderGrowth()}
           </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Bottom Tab Navigation */}
+      <div className="pillar-tab-bar">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="pillar-tab-list">
+            <TabsTrigger value="overview" className="pillar-tab-trigger">Overview</TabsTrigger>
+            <TabsTrigger value="connections" className="pillar-tab-trigger">Connections</TabsTrigger>
+            <TabsTrigger value="activities" className="pillar-tab-trigger">Activities</TabsTrigger>
+            <TabsTrigger value="growth" className="pillar-tab-trigger">Growth</TabsTrigger>
+          </TabsList>
         </Tabs>
       </div>
     </div>

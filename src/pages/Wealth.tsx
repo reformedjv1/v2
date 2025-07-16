@@ -291,13 +291,6 @@ export default function Wealth() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="overview" className="ios-segment">Overview</TabsTrigger>
-            <TabsTrigger value="investments" className="ios-segment">Investments</TabsTrigger>
-            <TabsTrigger value="expenses" className="ios-segment">Expenses</TabsTrigger>
-            <TabsTrigger value="goals" className="ios-segment">Goals</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="overview" className="mt-0">
             {renderOverview()}
           </TabsContent>
@@ -313,6 +306,18 @@ export default function Wealth() {
           <TabsContent value="goals" className="mt-0">
             {renderGoals()}
           </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Bottom Tab Navigation */}
+      <div className="pillar-tab-bar">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="pillar-tab-list">
+            <TabsTrigger value="overview" className="pillar-tab-trigger">Overview</TabsTrigger>
+            <TabsTrigger value="investments" className="pillar-tab-trigger">Investments</TabsTrigger>
+            <TabsTrigger value="expenses" className="pillar-tab-trigger">Expenses</TabsTrigger>
+            <TabsTrigger value="goals" className="pillar-tab-trigger">Goals</TabsTrigger>
+          </TabsList>
         </Tabs>
       </div>
     </div>

@@ -224,14 +224,6 @@ export default function Health() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
-            <TabsTrigger value="overview" className="ios-segment">Overview</TabsTrigger>
-            <TabsTrigger value="profile" className="ios-segment">Profile</TabsTrigger>
-            <TabsTrigger value="nutrition" className="ios-segment">Nutrition</TabsTrigger>
-            <TabsTrigger value="fitness" className="ios-segment">Fitness</TabsTrigger>
-            <TabsTrigger value="sleep" className="ios-segment">Sleep</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="overview" className="mt-0">
             {renderOverview()}
           </TabsContent>
@@ -251,6 +243,19 @@ export default function Health() {
           <TabsContent value="sleep" className="mt-0">
             <SleepTracker />
           </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Bottom Tab Navigation */}
+      <div className="pillar-tab-bar">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="pillar-tab-list">
+            <TabsTrigger value="overview" className="pillar-tab-trigger">Overview</TabsTrigger>
+            <TabsTrigger value="profile" className="pillar-tab-trigger">Profile</TabsTrigger>
+            <TabsTrigger value="nutrition" className="pillar-tab-trigger">Nutrition</TabsTrigger>
+            <TabsTrigger value="fitness" className="pillar-tab-trigger">Fitness</TabsTrigger>
+            <TabsTrigger value="sleep" className="pillar-tab-trigger">Sleep</TabsTrigger>
+          </TabsList>
         </Tabs>
       </div>
     </div>
