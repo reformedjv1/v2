@@ -246,18 +246,72 @@ export function NutritionTracker() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Servings (100g each)</Label>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      min="0.1"
-                      value={servings}
-                      onChange={(e) => setServings(e.target.value)}
-                      placeholder="1.0"
-                    />
+                    <Label className="flex items-center gap-2">
+                      <Scale className="h-4 w-4" />
+                      Portion Size
+                    </Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Amount</Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          min="0.1"
+                          value={servings}
+                          onChange={(e) => setServings(e.target.value)}
+                          placeholder="1.0"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Unit</Label>
+                        <Select defaultValue="100g">
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="100g">100g servings</SelectItem>
+                            <SelectItem value="1g">Grams</SelectItem>
+                            <SelectItem value="1oz">Ounces</SelectItem>
+                            <SelectItem value="1cup">Cups</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    {/* Scaled nutrition preview */}
+                    {selectedFood && Number(servings) > 0 && (
+                      <div className="p-3 bg-accent/50 rounded-lg mt-3">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">
+                          Total for {servings} × 100g:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedFood.nutrients.calories && (
+                            <Badge variant="secondary">
+                              {Math.round(selectedFood.nutrients.calories * Number(servings))} cal
+                            </Badge>
+                          )}
+                          {selectedFood.nutrients.protein && (
+                            <Badge variant="outline">
+                              P: {Math.round(selectedFood.nutrients.protein * Number(servings) * 10) / 10}g
+                            </Badge>
+                          )}
+                          {selectedFood.nutrients.carbs && (
+                            <Badge variant="outline">
+                              C: {Math.round(selectedFood.nutrients.carbs * Number(servings) * 10) / 10}g
+                            </Badge>
+                          )}
+                          {selectedFood.nutrients.fat && (
+                            <Badge variant="outline">
+                              F: {Math.round(selectedFood.nutrients.fat * Number(servings) * 10) / 10}g
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                  
                   <div className="space-y-2">
                     <Label>Meal Type</Label>
                     <Select value={mealType} onValueChange={setMealType}>
