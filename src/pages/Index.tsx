@@ -72,6 +72,7 @@ const Index = () => {
           <div>
             <div className="ios-large-title gradient-text">Trinity</div>
             <p className="text-sm text-muted-foreground">Life Optimization System</p>
+          </div>
             <div className="flex gap-2">
               <Button size="sm" variant="ghost" className="h-10 w-10 p-0 haptic-light">
                 <Bell className="h-5 w-5" />
