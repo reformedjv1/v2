@@ -291,7 +291,7 @@ export default function Wealth() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="ios-segmented mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="overview" className="ios-segment">Overview</TabsTrigger>
             <TabsTrigger value="investments" className="ios-segment">Investments</TabsTrigger>
             <TabsTrigger value="expenses" className="ios-segment">Expenses</TabsTrigger>

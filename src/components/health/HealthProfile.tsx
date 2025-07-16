@@ -47,6 +47,7 @@ export function HealthProfile() {
       const { data, error } = await supabase
         .from('user_profiles_health')
         .select('*')
+        .eq('user_id', user?.id)
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;

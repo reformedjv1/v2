@@ -271,7 +271,7 @@ export default function Relations() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="ios-segmented mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="overview" className="ios-segment">Overview</TabsTrigger>
             <TabsTrigger value="connections" className="ios-segment">Connections</TabsTrigger>
             <TabsTrigger value="activities" className="ios-segment">Activities</TabsTrigger>

@@ -58,6 +58,7 @@ export function DietTracker() {
       const { data, error } = await supabase
         .from('food_entries')
         .select('*')
+        .eq('user_id', user?.id)
         .gte('consumed_at', `${today}T00:00:00.000Z`)
         .lt('consumed_at', `${today}T23:59:59.999Z`)
         .order('consumed_at', { ascending: false });

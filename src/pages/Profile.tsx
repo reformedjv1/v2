@@ -700,7 +700,7 @@ export default function Profile() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="ios-segmented mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="profile" className="ios-segment">Profile</TabsTrigger>
             <TabsTrigger value="plans" className="ios-segment">Plans</TabsTrigger>
             <TabsTrigger value="settings" className="ios-segment">Settings</TabsTrigger>

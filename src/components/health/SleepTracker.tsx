@@ -41,6 +41,7 @@ export function SleepTracker() {
       const { data, error } = await supabase
         .from('sleep_records')
         .select('*')
+        .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
         .limit(7);
 

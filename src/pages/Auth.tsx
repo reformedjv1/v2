@@ -96,7 +96,7 @@ export default function Auth() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="ios-segmented mb-6">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="signin" className="ios-segment">Sign In</TabsTrigger>
                 <TabsTrigger value="signup" className="ios-segment">Sign Up</TabsTrigger>
               </TabsList>

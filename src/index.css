@@ -224,7 +224,7 @@ All colors MUST be HSL.
   }
   
   .bg-gold-500 {
-    background-color: hsl(var(--gold));
+    background-color: hsl(45 100% 51%);
   }
   
   /* iOS-style metric cards */

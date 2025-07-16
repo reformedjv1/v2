@@ -60,6 +60,7 @@ export function ExerciseTracker() {
       const { data, error } = await supabase
         .from('exercise_records')
         .select('*')
+        .eq('user_id', user?.id)
         .gte('completed_at', oneWeekAgo.toISOString())
         .order('completed_at', { ascending: false });
 
