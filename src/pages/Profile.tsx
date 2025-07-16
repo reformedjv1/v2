@@ -632,12 +632,12 @@ export default function Profile() {
           <div className="ios-list-item haptic-selection">
             <Lock className="h-5 w-5 text-muted-foreground mr-3" />
             <span className="flex-1">Privacy & Security</span>
-            <span className="text-muted-foreground">></span>
+            <span className="text-muted-foreground">{'>'}</span>
           </div>
           <div className="ios-list-item haptic-selection">
             <CreditCard className="h-5 w-5 text-muted-foreground mr-3" />
             <span className="flex-1">Billing & Payments</span>
-            <span className="text-muted-foreground">></span>
+            <span className="text-muted-foreground">{'>'}</span>
           </div>
         </div>
       </Card>
