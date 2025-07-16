@@ -384,6 +384,34 @@ All colors MUST be HSL.
     @apply text-primary;
   }
 
+  /* iOS-style pillar tabs - bottom navigation */
+  .pillar-tab-bar {
+    @apply fixed bottom-20 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .pillar-tab-list {
+    @apply flex items-center justify-around p-2;
+    min-height: 60px;
+  }
+
+  .pillar-tab-trigger {
+    @apply flex-1 py-3 px-2 text-xs font-medium text-center transition-all duration-200 rounded-xl;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pillar-tab-trigger[data-state="active"] {
+    @apply bg-primary text-primary-foreground shadow-sm;
+  }
+
+  .pillar-tab-trigger:not([data-state="active"]) {
+    @apply text-muted-foreground hover:text-foreground;
+  }
   /* iOS-style pull-to-refresh */
   .ios-pull-refresh {
     @apply flex items-center justify-center py-4;
