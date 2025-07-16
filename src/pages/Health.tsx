@@ -21,8 +21,7 @@ import {
   User
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { HealthProfile } from "@/components/health/HealthProfile";
-import { DietTracker } from "@/components/health/DietTracker";
+import { NutritionTracker } from "@/components/health/NutritionTracker";
 import { ExerciseTracker } from "@/components/health/ExerciseTracker";
 import { SleepTracker } from "@/components/health/SleepTracker";
 
@@ -228,12 +227,8 @@ export default function Health() {
             {renderOverview()}
           </TabsContent>
 
-          <TabsContent value="profile" className="mt-0">
-            <HealthProfile />
-          </TabsContent>
-
           <TabsContent value="nutrition" className="mt-0">
-            <DietTracker />
+            <NutritionTracker />
           </TabsContent>
 
           <TabsContent value="fitness" className="mt-0">
@@ -251,7 +246,6 @@ export default function Health() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="pillar-tab-list">
             <TabsTrigger value="overview" className="pillar-tab-trigger">Overview</TabsTrigger>
-            <TabsTrigger value="profile" className="pillar-tab-trigger">Profile</TabsTrigger>
             <TabsTrigger value="nutrition" className="pillar-tab-trigger">Nutrition</TabsTrigger>
             <TabsTrigger value="fitness" className="pillar-tab-trigger">Fitness</TabsTrigger>
             <TabsTrigger value="sleep" className="pillar-tab-trigger">Sleep</TabsTrigger>

@@ -649,12 +649,12 @@ export default function Profile() {
           <div className="ios-list-item haptic-selection">
             <HelpCircle className="h-5 w-5 text-muted-foreground mr-3" />
             <span className="flex-1">Help Center</span>
-            <span className="text-muted-foreground">></span>
+            <span className="text-muted-foreground">{'>'}</span>
           </div>
           <div className="ios-list-item haptic-selection">
             <Mail className="h-5 w-5 text-muted-foreground mr-3" />
             <span className="flex-1">Contact Support</span>
-            <span className="text-muted-foreground">></span>
+            <span className="text-muted-foreground">{'>'}</span>
           </div>
         </div>
       </Card>
