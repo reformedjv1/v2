@@ -700,12 +700,6 @@ export default function Profile() {
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="profile" className="ios-segment">Profile</TabsTrigger>
-            <TabsTrigger value="plans" className="ios-segment">Plans</TabsTrigger>
-            <TabsTrigger value="settings" className="ios-segment">Settings</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="profile" className="mt-0">
             {renderProfileTab()}
           </TabsContent>
@@ -717,6 +711,17 @@ export default function Profile() {
           <TabsContent value="settings" className="mt-0">
             {renderSettingsTab()}
           </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Bottom Tab Navigation */}
+      <div className="pillar-tab-bar">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="pillar-tab-list">
+            <TabsTrigger value="profile" className="pillar-tab-trigger">Profile</TabsTrigger>
+            <TabsTrigger value="plans" className="pillar-tab-trigger">Plans</TabsTrigger>
+            <TabsTrigger value="settings" className="pillar-tab-trigger">Settings</TabsTrigger>
+          </TabsList>
         </Tabs>
       </div>
     </div>
