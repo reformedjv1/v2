@@ -289,16 +289,38 @@ export default function Relations() {
         </Tabs>
       </div>
 
-      {/* Bottom Tab Navigation */}
-      <div className="pillar-tab-bar">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="pillar-tab-list">
-            <TabsTrigger value="overview" className="pillar-tab-trigger">Overview</TabsTrigger>
-            <TabsTrigger value="connections" className="pillar-tab-trigger">Connections</TabsTrigger>
-            <TabsTrigger value="activities" className="pillar-tab-trigger">Activities</TabsTrigger>
-            <TabsTrigger value="growth" className="pillar-tab-trigger">Growth</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      {/* Bottom Tab Navigation - Full Width */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
+        <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full h-14 grid grid-cols-4 bg-muted/50 rounded-xl p-1">
+              <TabsTrigger 
+                value="overview" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="connections" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Connections
+              </TabsTrigger>
+              <TabsTrigger 
+                value="activities" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Activities
+              </TabsTrigger>
+              <TabsTrigger 
+                value="growth" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Growth
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
