@@ -25,6 +25,7 @@ import { NutritionTracker } from "@/components/health/NutritionTracker";
 import { ExerciseTracker } from "@/components/health/ExerciseTracker";
 import { SleepTracker } from "@/components/health/SleepTracker";
 import { WomensHealth } from "@/components/health/WomensHealth";
+import { MentalHealth } from "@/components/health/MentalHealth";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -45,7 +46,7 @@ export default function Health() {
     { label: 'Log Sleep', icon: Moon, action: () => setActiveTab('sleep') },
     { label: 'Track Meal', icon: Utensils, action: () => setActiveTab('nutrition') },
     { label: 'Record Workout', icon: Dumbbell, action: () => setActiveTab('fitness') },
-    { label: 'Mood Check', icon: Brain, action: () => {} }
+    { label: 'Mood Check', icon: Brain, action: () => setActiveTab('mental-health') }
   ];
 
   const todaysGoals = [
@@ -90,9 +91,12 @@ export default function Health() {
         .from('user_profiles_health')
         .select('gender')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user gender:', error);
+        return;
+      }
       
       if (data) {
         setUserGender(data.gender);
@@ -221,7 +225,7 @@ export default function Health() {
   );
 
   const isWoman = userGender === 'female';
-  const tabsCount = isWoman ? 5 : 4;
+  const tabsCount = isWoman ? 6 : 5; // Include mental health + women's health if applicable
 
   return (
     <div className="min-h-screen bg-background safe-area-top safe-area-bottom ios-scroll">
@@ -271,6 +275,10 @@ export default function Health() {
             <SleepTracker />
           </TabsContent>
 
+          <TabsContent value="mental-health" className="mt-0">
+            <MentalHealth />
+          </TabsContent>
+
           {isWoman && (
             <TabsContent value="womens-health" className="mt-0">
               <WomensHealth />
@@ -281,37 +289,43 @@ export default function Health() {
 
       {/* Bottom Tab Navigation - Full Width */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
-        <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+        <div className="w-full px-2 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className={`w-full h-14 grid grid-cols-${tabsCount} bg-muted/50 rounded-xl p-1`}>
               <TabsTrigger 
                 value="overview" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="nutrition" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Nutrition
               </TabsTrigger>
               <TabsTrigger 
                 value="fitness" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Fitness
               </TabsTrigger>
               <TabsTrigger 
                 value="sleep" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Sleep
+              </TabsTrigger>
+              <TabsTrigger 
+                value="mental-health" 
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Mental
               </TabsTrigger>
               {isWoman && (
                 <TabsTrigger 
                   value="womens-health" 
-                  className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                  className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
                 >
                   Women's
                 </TabsTrigger>
