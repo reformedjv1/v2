@@ -241,16 +241,38 @@ export default function Health() {
         </Tabs>
       </div>
 
-      {/* Bottom Tab Navigation */}
-      <div className="pillar-tab-bar">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="pillar-tab-list">
-            <TabsTrigger value="overview" className="pillar-tab-trigger">Overview</TabsTrigger>
-            <TabsTrigger value="nutrition" className="pillar-tab-trigger">Nutrition</TabsTrigger>
-            <TabsTrigger value="fitness" className="pillar-tab-trigger">Fitness</TabsTrigger>
-            <TabsTrigger value="sleep" className="pillar-tab-trigger">Sleep</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      {/* Bottom Tab Navigation - Full Width */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
+        <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full h-14 grid grid-cols-4 bg-muted/50 rounded-xl p-1">
+              <TabsTrigger 
+                value="overview" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="nutrition" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Nutrition
+              </TabsTrigger>
+              <TabsTrigger 
+                value="fitness" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Fitness
+              </TabsTrigger>
+              <TabsTrigger 
+                value="sleep" 
+                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Sleep
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
