@@ -409,119 +409,136 @@ export function NutritionTracker() {
             </Card>
           )}
 
-          {/* Simplified Key Nutrients */}
+          {/* Improved Vitamins & Minerals Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Key Nutrients</CardTitle>
-              <CardDescription>Essential vitamins and minerals for your health</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Essential Nutrients
+              </CardTitle>
+              <CardDescription>Key vitamins and minerals for optimal health</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Essential nutrients with icons and simplified tracking */}
-                <div className="p-4 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-                      <Eye className="h-5 w-5 text-white" />
+              <div className="grid grid-cols-1 gap-4">
+                {/* Vitamin C */}
+                <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-xl border border-orange-200/50 dark:border-orange-800/50">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-sm">
+                        <Eye className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-sm">Vitamin C</h4>
+                        <p className="text-xs text-muted-foreground">Immune support & antioxidant</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium">Vitamin C</h4>
-                      <p className="text-xs text-muted-foreground">Immune support</p>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-orange-600 dark:text-orange-400">
+                        {Math.round(getTotalNutrient('total_calories') * 0.05)}mg
+                      </div>
+                      <p className="text-xs text-muted-foreground">of 90mg</p>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Daily intake</span>
-                      <span className="font-medium">{Math.round(getTotalNutrient('total_calories') * 0.05)}mg</span>
-                    </div>
-                    <Progress value={Math.min(65, 100)} className="h-2" />
-                    <p className="text-xs text-muted-foreground">65% of daily value (90mg)</p>
-                  </div>
+                  <Progress value={Math.min(65, 100)} className="h-2 bg-orange-100 dark:bg-orange-900/20" />
+                  <p className="text-xs text-muted-foreground mt-2">65% of daily value</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
-                      <Zap className="h-5 w-5 text-white" />
+                {/* Vitamin D */}
+                <div className="p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 rounded-xl border border-yellow-200/50 dark:border-yellow-800/50">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-xl flex items-center justify-center shadow-sm">
+                        <Zap className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-sm">Vitamin D</h4>
+                        <p className="text-xs text-muted-foreground">Bone health & mood</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium">Vitamin D</h4>
-                      <p className="text-xs text-muted-foreground">Bone health</p>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+                        {Math.round(getTotalNutrient('total_calories') * 0.01)}μg
+                      </div>
+                      <p className="text-xs text-muted-foreground">of 20μg</p>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Daily intake</span>
-                      <span className="font-medium">{Math.round(getTotalNutrient('total_calories') * 0.01)}μg</span>
-                    </div>
-                    <Progress value={Math.min(45, 100)} className="h-2" />
-                    <p className="text-xs text-muted-foreground">45% of daily value (20μg)</p>
-                  </div>
+                  <Progress value={Math.min(45, 100)} className="h-2 bg-yellow-100 dark:bg-yellow-900/20" />
+                  <p className="text-xs text-muted-foreground mt-2">45% of daily value</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-950/20 dark:to-blue-950/20 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-gray-500 rounded-xl flex items-center justify-center">
-                      <Bone className="h-5 w-5 text-white" />
+                {/* Calcium */}
+                <div className="p-4 bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-950/20 dark:to-blue-950/20 rounded-xl border border-slate-200/50 dark:border-slate-800/50">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
+                        <Bone className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-sm">Calcium</h4>
+                        <p className="text-xs text-muted-foreground">Strong bones & teeth</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium">Calcium</h4>
-                      <p className="text-xs text-muted-foreground">Strong bones</p>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                        {Math.round(getTotalNutrient('total_calories') * 0.4)}mg
+                      </div>
+                      <p className="text-xs text-muted-foreground">of 1000mg</p>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Daily intake</span>
-                      <span className="font-medium">{Math.round(getTotalNutrient('total_calories') * 0.4)}mg</span>
-                    </div>
-                    <Progress value={Math.min(58, 100)} className="h-2" />
-                    <p className="text-xs text-muted-foreground">58% of daily value (1000mg)</p>
-                  </div>
+                  <Progress value={Math.min(58, 100)} className="h-2 bg-slate-100 dark:bg-slate-900/20" />
+                  <p className="text-xs text-muted-foreground mt-2">58% of daily value</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
-                      <Shield className="h-5 w-5 text-white" />
+                {/* Iron */}
+                <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20 rounded-xl border border-red-200/50 dark:border-red-800/50">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center shadow-sm">
+                        <Shield className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-sm">Iron</h4>
+                        <p className="text-xs text-muted-foreground">Energy & oxygen transport</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium">Iron</h4>
-                      <p className="text-xs text-muted-foreground">Energy levels</p>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-red-600 dark:text-red-400">
+                        {Math.round(getTotalNutrient('total_calories') * 0.008)}mg
+                      </div>
+                      <p className="text-xs text-muted-foreground">of 18mg</p>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Daily intake</span>
-                      <span className="font-medium">{Math.round(getTotalNutrient('total_calories') * 0.008)}mg</span>
-                    </div>
-                    <Progress value={Math.min(42, 100)} className="h-2" />
-                    <p className="text-xs text-muted-foreground">42% of daily value (18mg)</p>
-                  </div>
+                  <Progress value={Math.min(42, 100)} className="h-2 bg-red-100 dark:bg-red-900/20" />
+                  <p className="text-xs text-muted-foreground mt-2">42% of daily value</p>
                 </div>
               </div>
 
-              <Separator className="my-4" />
+              <Separator className="my-6" />
 
-              {/* Basic nutrients */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Fiber</span>
-                    <span>{getTotalNutrient('fiber_g')}g</span>
+              {/* Basic nutrients in a cleaner grid */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm">Other Nutrients</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">Fiber</span>
+                      <span className="text-sm text-muted-foreground">{getTotalNutrient('fiber_g')}g</span>
+                    </div>
+                    <Progress value={getDailyValue('fiber_g', getTotalNutrient('fiber_g'))} className="h-2" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {getDailyValue('fiber_g', getTotalNutrient('fiber_g'))}% of 25g
+                    </p>
                   </div>
-                  <Progress value={getDailyValue('fiber_g', getTotalNutrient('fiber_g'))} className="h-2" />
-                  <p className="text-xs text-muted-foreground">
-                    {getDailyValue('fiber_g', getTotalNutrient('fiber_g'))}% DV
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Sodium</span>
-                    <span>{getTotalNutrient('sodium_mg')}mg</span>
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">Sodium</span>
+                      <span className="text-sm text-muted-foreground">{getTotalNutrient('sodium_mg')}mg</span>
+                    </div>
+                    <Progress value={getDailyValue('sodium_mg', getTotalNutrient('sodium_mg'))} className="h-2" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {getDailyValue('sodium_mg', getTotalNutrient('sodium_mg'))}% of 2300mg
+                    </p>
                   </div>
-                  <Progress value={getDailyValue('sodium_mg', getTotalNutrient('sodium_mg'))} className="h-2" />
-                  <p className="text-xs text-muted-foreground">
-                    {getDailyValue('sodium_mg', getTotalNutrient('sodium_mg'))}% DV
-                  </p>
                 </div>
               </div>
             </CardContent>
