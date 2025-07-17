@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NutritionTracker } from "@/components/health/NutritionTracker";
 import { ExerciseTracker } from "@/components/health/ExerciseTracker";
 import { SleepTracker } from "@/components/health/SleepTracker";
+import { WomensHealth } from "@/components/health/WomensHealth";
+import { useAuth } from "@/components/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Health() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const [userGender, setUserGender] = useState<string | null>(null);
 
   const healthMetrics = [
     { label: 'Sleep Score', value: 78, unit: '/100', icon: Moon, color: 'bg-blue-500', trend: '+5%' },
@@ -72,6 +77,30 @@ export default function Health() {
       time: '6h ago'
     }
   ];
+
+  useEffect(() => {
+    if (user) {
+      fetchUserGender();
+    }
+  }, [user]);
+
+  const fetchUserGender = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles_health')
+        .select('gender')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setUserGender(data.gender);
+      }
+    } catch (error) {
+      console.error('Error fetching user gender:', error);
+    }
+  };
 
   const renderOverview = () => (
     <div className="space-y-6">
@@ -191,6 +220,9 @@ export default function Health() {
     </div>
   );
 
+  const isWoman = userGender === 'female';
+  const tabsCount = isWoman ? 5 : 4;
+
   return (
     <div className="min-h-screen bg-background safe-area-top safe-area-bottom ios-scroll">
       {/* iOS-style Header */}
@@ -238,6 +270,12 @@ export default function Health() {
           <TabsContent value="sleep" className="mt-0">
             <SleepTracker />
           </TabsContent>
+
+          {isWoman && (
+            <TabsContent value="womens-health" className="mt-0">
+              <WomensHealth />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
 
@@ -245,7 +283,7 @@ export default function Health() {
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
         <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full h-14 grid grid-cols-4 bg-muted/50 rounded-xl p-1">
+            <TabsList className={`w-full h-14 grid grid-cols-${tabsCount} bg-muted/50 rounded-xl p-1`}>
               <TabsTrigger 
                 value="overview" 
                 className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
@@ -270,6 +308,14 @@ export default function Health() {
               >
                 Sleep
               </TabsTrigger>
+              {isWoman && (
+                <TabsTrigger 
+                  value="womens-health" 
+                  className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
+                  Women's
+                </TabsTrigger>
+              )}
             </TabsList>
           </Tabs>
         </div>

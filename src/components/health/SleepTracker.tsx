@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Moon, Clock, Plus, Bell } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Moon, Clock, Plus, Bell, Lightbulb, Thermometer, Volume2, Brain } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -124,6 +125,51 @@ export function SleepTracker() {
     }
   };
 
+  const getSuggestedBedtime = () => {
+    if (!wakeTime) return null;
+    
+    const [hours, minutes] = wakeTime.split(':').map(Number);
+    const wakeDate = new Date();
+    wakeDate.setHours(hours, minutes, 0, 0);
+    
+    // Subtract 8 hours for optimal sleep
+    const suggestedBedtime = new Date(wakeDate.getTime() - 8 * 60 * 60 * 1000);
+    
+    // If bedtime would be the previous day, adjust
+    if (suggestedBedtime.getDate() !== wakeDate.getDate()) {
+      suggestedBedtime.setDate(suggestedBedtime.getDate() + 1);
+    }
+    
+    return suggestedBedtime.toTimeString().slice(0, 5);
+  };
+
+  const getSleepTips = () => [
+    {
+      icon: Thermometer,
+      title: "Optimal Temperature",
+      tip: "Keep your bedroom between 60-67°F (15-19°C) for the best sleep quality.",
+      science: "Core body temperature naturally drops to initiate sleep."
+    },
+    {
+      icon: Volume2,
+      title: "Sound Environment", 
+      tip: "Aim for under 30 decibels. Use white noise or earplugs if needed.",
+      science: "Noise above 35dB can fragment sleep and reduce deep sleep stages."
+    },
+    {
+      icon: Moon,
+      title: "Light Control",
+      tip: "Complete darkness or use blackout curtains and eye masks.",
+      science: "Light exposure suppresses melatonin production, delaying sleep onset."
+    },
+    {
+      icon: Brain,
+      title: "Sleep Hygiene",
+      tip: "No screens 1 hour before bed. Blue light disrupts circadian rhythm.",
+      science: "Blue light wavelengths (480nm) most strongly suppress melatonin."
+    }
+  ];
+
   const getAverageSleep = () => {
     if (sleepRecords.length === 0) return 0;
     const total = sleepRecords.reduce((sum, record) => sum + record.sleep_duration_hours, 0);
@@ -135,6 +181,8 @@ export function SleepTracker() {
     const total = sleepRecords.reduce((sum, record) => sum + record.sleep_quality, 0);
     return Math.round((total / sleepRecords.length) * 10) / 10;
   };
+
+  const suggestedBedtime = getSuggestedBedtime();
 
   return (
     <div className="space-y-6 px-4 pb-6">
@@ -153,16 +201,6 @@ export function SleepTracker() {
           {/* Time Inputs */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="bedtime" className="text-sm font-medium">Bedtime</Label>
-              <Input
-                id="bedtime"
-                type="time"
-                value={bedtime}
-                onChange={(e) => setBedtime(e.target.value)}
-                className="h-12 text-lg"
-              />
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="wake-time" className="text-sm font-medium">Wake Time</Label>
               <Input
                 id="wake-time"
@@ -171,6 +209,39 @@ export function SleepTracker() {
                 onChange={(e) => setWakeTime(e.target.value)}
                 className="h-12 text-lg"
               />
+            </div>
+            
+            {/* Suggested Bedtime */}
+            {suggestedBedtime && (
+              <Alert className="bg-blue-50 border-blue-200">
+                <Bell className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  <strong>Suggested bedtime:</strong> {suggestedBedtime} (for 8 hours of sleep)
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="bedtime" className="text-sm font-medium">Bedtime</Label>
+              <Input
+                id="bedtime"
+                type="time"
+                value={bedtime}
+                onChange={(e) => setBedtime(e.target.value)}
+                className="h-12 text-lg"
+                placeholder={suggestedBedtime || ''}
+              />
+              {suggestedBedtime && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBedtime(suggestedBedtime)}
+                  className="text-xs"
+                >
+                  Use suggested time
+                </Button>
+              )}
             </div>
           </div>
 
@@ -228,6 +299,38 @@ export function SleepTracker() {
             <Plus className="h-5 w-5 mr-2" />
             Log Sleep
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Sleep Tips Card */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-yellow-500/10 rounded-lg">
+              <Lightbulb className="h-5 w-5 text-yellow-600" />
+            </div>
+            Sleep Optimization Tips
+          </CardTitle>
+          <CardDescription className="text-sm">Science-backed recommendations for better sleep</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {getSleepTips().map((tip, index) => {
+            const Icon = tip.icon;
+            return (
+              <div key={index} className="p-4 border rounded-lg space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Icon className="h-4 w-4 text-primary" />
+                  </div>
+                  <h4 className="font-semibold text-sm">{tip.title}</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">{tip.tip}</p>
+                <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border-l-2 border-blue-200">
+                  <strong>Science:</strong> {tip.science}
+                </div>
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
 
