@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Save, Camera, Mail, Calendar, MapPin } from 'lucide-react';
+import { User, Save, Camera, Mail, Calendar, MapPin, Calculator, Activity } from 'lucide-react';
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,15 @@ interface ProfileData {
   timezone: string;
 }
 
+interface HealthProfileData {
+  height_cm: number;
+  weight_kg: number;
+  gender: string;
+  birth_date: string;
+  activity_level: string;
+  goal_type: string;
+}
+
 export function ProfileEditor() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -33,12 +42,22 @@ export function ProfileEditor() {
     birth_date: '',
     timezone: 'UTC'
   });
+  const [healthProfile, setHealthProfile] = useState<HealthProfileData>({
+    height_cm: 0,
+    weight_kg: 0,
+    gender: '',
+    birth_date: '',
+    activity_level: 'moderate',
+    goal_type: 'maintain'
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [hasHealthChanges, setHasHealthChanges] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
+      fetchHealthProfile();
     }
   }, [user]);
 
@@ -66,9 +85,42 @@ export function ProfileEditor() {
     }
   };
 
+  const fetchHealthProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles_health')
+        .select('*')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching health profile:', error);
+        return;
+      }
+
+      if (data) {
+        setHealthProfile({
+          height_cm: data.height_cm || 0,
+          weight_kg: data.weight_kg || 0,
+          gender: data.gender || '',
+          birth_date: data.birth_date || '',
+          activity_level: data.activity_level || 'moderate',
+          goal_type: data.goal_type || 'maintain'
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching health profile:', error);
+    }
+  };
+
   const updateProfile = (field: keyof ProfileData, value: string) => {
     setProfile(prev => ({ ...prev, [field]: value }));
     setHasChanges(true);
+  };
+
+  const updateHealthProfile = (field: keyof HealthProfileData, value: string | number) => {
+    setHealthProfile(prev => ({ ...prev, [field]: value }));
+    setHasHealthChanges(true);
   };
 
   const saveProfile = async () => {
@@ -104,6 +156,68 @@ export function ProfileEditor() {
     }
   };
 
+  const saveHealthProfile = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_profiles_health')
+        .upsert({
+          user_id: user.id,
+          height_cm: healthProfile.height_cm,
+          weight_kg: healthProfile.weight_kg,
+          gender: healthProfile.gender,
+          birth_date: healthProfile.birth_date,
+          activity_level: healthProfile.activity_level,
+          goal_type: healthProfile.goal_type
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Health profile updated",
+        description: "Your health information has been saved successfully"
+      });
+
+      setHasHealthChanges(false);
+    } catch (error) {
+      console.error('Error saving health profile:', error);
+      toast({
+        title: "Error saving health profile",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const calculateBMI = () => {
+    if (!healthProfile.height_cm || !healthProfile.weight_kg) return 0;
+    const heightM = healthProfile.height_cm / 100;
+    return Math.round((healthProfile.weight_kg / (heightM * heightM)) * 10) / 10;
+  };
+
+  const getBMICategory = (bmi: number) => {
+    if (bmi < 18.5) return { category: 'Underweight', color: 'text-blue-600' };
+    if (bmi < 25) return { category: 'Normal weight', color: 'text-green-600' };
+    if (bmi < 30) return { category: 'Overweight', color: 'text-orange-600' };
+    return { category: 'Obese', color: 'text-red-600' };
+  };
+
+  const calculateAge = () => {
+    if (!healthProfile.birth_date) return 0;
+    const today = new Date();
+    const birthDate = new Date(healthProfile.birth_date);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const timezones = [
     'UTC',
     'America/New_York',
@@ -117,6 +231,10 @@ export function ProfileEditor() {
     'Asia/Shanghai',
     'Australia/Sydney'
   ];
+
+  const bmi = calculateBMI();
+  const bmiInfo = getBMICategory(bmi);
+  const age = calculateAge();
 
   return (
     <div className="space-y-6">
@@ -209,6 +327,136 @@ export function ProfileEditor() {
               className="min-h-[80px] resize-none"
             />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Health Information */}
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            Health Information
+          </CardTitle>
+          <CardDescription>
+            Essential health data for personalized recommendations
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="gender">Gender</Label>
+              <Select value={healthProfile.gender} onValueChange={(value) => updateHealthProfile('gender', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">👨 Male</SelectItem>
+                  <SelectItem value="female">👩 Female</SelectItem>
+                  <SelectItem value="other">🧑 Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="health-birth-date">Birth Date</Label>
+              <Input
+                id="health-birth-date"
+                type="date"
+                value={healthProfile.birth_date}
+                onChange={(e) => updateHealthProfile('birth_date', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="height">Height (cm)</Label>
+              <Input
+                id="height"
+                type="number"
+                placeholder="170"
+                value={healthProfile.height_cm || ''}
+                onChange={(e) => updateHealthProfile('height_cm', Number(e.target.value))}
+                className="text-center"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="weight">Weight (kg)</Label>
+              <Input
+                id="weight"
+                type="number"
+                step="0.1"
+                placeholder="70.0"
+                value={healthProfile.weight_kg || ''}
+                onChange={(e) => updateHealthProfile('weight_kg', Number(e.target.value))}
+                className="text-center"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="activity-level">Activity Level</Label>
+              <Select value={healthProfile.activity_level} onValueChange={(value) => updateHealthProfile('activity_level', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sedentary">🛋️ Sedentary</SelectItem>
+                  <SelectItem value="light">🚶 Light Activity</SelectItem>
+                  <SelectItem value="moderate">🏃 Moderate Activity</SelectItem>
+                  <SelectItem value="active">💪 Very Active</SelectItem>
+                  <SelectItem value="very_active">🔥 Extremely Active</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="goal-type">Health Goal</Label>
+              <Select value={healthProfile.goal_type} onValueChange={(value) => updateHealthProfile('goal_type', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lose">📉 Lose Weight</SelectItem>
+                  <SelectItem value="maintain">⚖️ Maintain Weight</SelectItem>
+                  <SelectItem value="gain">📈 Gain Weight</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Health Metrics Display */}
+          {bmi > 0 && (
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-4">
+                <Calculator className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-sm">Health Metrics</span>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-3 bg-card rounded-lg">
+                  <div className="text-lg font-bold text-primary">BMI: {bmi}</div>
+                  <div className={`text-xs ${bmiInfo.color} mt-1`}>{bmiInfo.category}</div>
+                </div>
+                <div className="text-center p-3 bg-card rounded-lg">
+                  <div className="text-lg font-bold text-primary">{age}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Years Old</div>
+                </div>
+                <div className="text-center p-3 bg-card rounded-lg">
+                  <div className="text-lg font-bold text-primary">{healthProfile.gender === 'female' ? '♀️' : healthProfile.gender === 'male' ? '♂️' : '⚧️'}</div>
+                  <div className="text-xs text-muted-foreground mt-1 capitalize">{healthProfile.gender}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Save Health Profile Button */}
+          <Button 
+            onClick={saveHealthProfile}
+            disabled={!hasHealthChanges || isLoading}
+            className="w-full ios-button-primary"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isLoading ? 'Saving...' : 'Save Health Profile'}
+          </Button>
         </CardContent>
       </Card>
 
