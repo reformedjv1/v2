@@ -290,43 +290,43 @@ export default function Health() {
 
       {/* Bottom Tab Navigation - Fixed Horizontal Layout */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
-        <div className="w-full px-2 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+        <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className={`w-full h-14 grid grid-cols-${tabsCount} bg-muted/50 rounded-xl p-1`}>
+            <TabsList className="w-full h-12 flex bg-muted/50 rounded-xl p-1 overflow-x-auto">
               <TabsTrigger 
                 value="overview" 
-                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 min-w-0 py-2 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm whitespace-nowrap"
               >
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="nutrition" 
-                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 min-w-0 py-2 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm whitespace-nowrap"
               >
                 Nutrition
               </TabsTrigger>
               <TabsTrigger 
                 value="fitness" 
-                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 min-w-0 py-2 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm whitespace-nowrap"
               >
                 Fitness
               </TabsTrigger>
               <TabsTrigger 
                 value="sleep" 
-                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 min-w-0 py-2 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm whitespace-nowrap"
               >
                 Sleep
               </TabsTrigger>
               <TabsTrigger 
                 value="mental-health" 
-                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 min-w-0 py-2 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm whitespace-nowrap"
               >
                 Mental
               </TabsTrigger>
               {isWoman && (
                 <TabsTrigger 
                   value="womens-health" 
-                  className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                  className="flex-1 min-w-0 py-2 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm whitespace-nowrap"
                 >
                   Women's
                 </TabsTrigger>
