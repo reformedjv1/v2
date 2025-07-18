@@ -107,6 +107,13 @@ export default function Health() {
     }
   };
 
+  // Refetch user gender when returning to overview tab
+  useEffect(() => {
+    if (activeTab === 'overview' && user) {
+      fetchUserGender();
+    }
+  }, [activeTab, user]);
+
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Daily Score */}

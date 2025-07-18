@@ -193,7 +193,7 @@ export default function Profile() {
             <Button 
               variant="outline" 
               className="h-16 flex-col gap-2"
-              onClick={() => toast({ title: "Settings", description: "Settings panel coming soon!" })}
+              onClick={() => setActiveTab('settings')}
             >
               <Settings className="h-5 w-5" />
               <span className="text-xs">Settings</span>
