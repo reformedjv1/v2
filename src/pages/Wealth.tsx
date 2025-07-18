@@ -1,13 +1,14 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { 
   TrendingUp, 
   Calendar,
   Target,
-  BarChart3,
   Settings,
   ArrowLeft,
   DollarSign,
@@ -15,13 +16,22 @@ import {
   Wallet,
   ArrowUpRight,
   CreditCard,
-  Plus
+  Plus,
+  TrendingDown,
+  Calculator,
+  Receipt,
+  Banknote
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Wealth() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  const [transactionAmount, setTransactionAmount] = useState('');
+  const [transactionDesc, setTransactionDesc] = useState('');
+  const [investmentAmount, setInvestmentAmount] = useState('');
 
   const wealthMetrics = [
     { label: 'Net Worth', value: 127000, unit: '', icon: Wallet, color: 'bg-green-500', trend: '+24%', prefix: '$' },
@@ -31,10 +41,41 @@ export default function Wealth() {
   ];
 
   const quickActions = [
-    { label: 'Add Transaction', icon: Plus, action: () => {} },
-    { label: 'Pay Bills', icon: CreditCard, action: () => {} },
-    { label: 'Transfer Savings', icon: PiggyBank, action: () => {} },
-    { label: 'Invest Funds', icon: TrendingUp, action: () => {} }
+    { 
+      label: 'Add Transaction', 
+      icon: Plus, 
+      action: () => {
+        if (transactionAmount && transactionDesc) {
+          toast({ title: "Transaction added!", description: `${transactionDesc}: $${transactionAmount}` });
+          setTransactionAmount('');
+          setTransactionDesc('');
+        }
+      }
+    },
+    { 
+      label: 'Pay Bills', 
+      icon: Receipt, 
+      action: () => {
+        toast({ title: "Bills paid!", description: "Monthly expenses updated" });
+      }
+    },
+    { 
+      label: 'Transfer Savings', 
+      icon: PiggyBank, 
+      action: () => {
+        toast({ title: "Savings transferred!", description: "Emergency fund updated" });
+      }
+    },
+    { 
+      label: 'Invest Funds', 
+      icon: TrendingUp, 
+      action: () => {
+        if (investmentAmount) {
+          toast({ title: "Investment made!", description: `$${investmentAmount} invested` });
+          setInvestmentAmount('');
+        }
+      }
+    }
   ];
 
   const todaysGoals = [
@@ -136,24 +177,46 @@ export default function Wealth() {
         </div>
       </Card>
 
-      {/* Quick Actions */}
+      {/* Quick Transaction Entry */}
       <Card className="ios-card">
-        <h3 className="font-semibold mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {quickActions.map((action, index) => {
-            const Icon = action.icon;
-            return (
-              <Button
-                key={index}
-                variant="outline"
-                className="ios-button-secondary haptic-medium h-16 flex-col gap-2"
-                onClick={action.action}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-xs">{action.label}</span>
-              </Button>
-            );
-          })}
+        <h3 className="font-semibold mb-4">Quick Transaction</h3>
+        <div className="space-y-3">
+          <Input
+            placeholder="Amount ($)"
+            value={transactionAmount}
+            onChange={(e) => setTransactionAmount(e.target.value)}
+            type="number"
+          />
+          <Input
+            placeholder="Description"
+            value={transactionDesc}
+            onChange={(e) => setTransactionDesc(e.target.value)}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <Button 
+              onClick={() => quickActions[0].action()}
+              className="ios-button-primary"
+              disabled={!transactionAmount || !transactionDesc}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Expense
+            </Button>
+            <Button 
+              onClick={() => {
+                if (transactionAmount && transactionDesc) {
+                  toast({ title: "Income added!", description: `${transactionDesc}: +$${transactionAmount}` });
+                  setTransactionAmount('');
+                  setTransactionDesc('');
+                }
+              }}
+              variant="outline"
+              className="ios-button-secondary"
+              disabled={!transactionAmount || !transactionDesc}
+            >
+              <ArrowUpRight className="h-4 w-4 mr-1" />
+              Add Income
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -206,6 +269,53 @@ export default function Wealth() {
           ))}
         </div>
       </Card>
+
+      <Card className="ios-card">
+        <h3 className="font-semibold mb-4">Quick Invest</h3>
+        <div className="space-y-3">
+          <Input
+            placeholder="Amount to invest ($)"
+            value={investmentAmount}
+            onChange={(e) => setInvestmentAmount(e.target.value)}
+            type="number"
+          />
+          <div className="grid grid-cols-3 gap-2">
+            <Button 
+              onClick={() => quickActions[3].action()}
+              className="ios-button-primary text-xs py-2"
+              disabled={!investmentAmount}
+            >
+              S&P 500
+            </Button>
+            <Button 
+              onClick={() => {
+                if (investmentAmount) {
+                  toast({ title: "Bonds purchased!", description: `$${investmentAmount} in bonds` });
+                  setInvestmentAmount('');
+                }
+              }}
+              variant="outline"
+              className="ios-button-secondary text-xs py-2"
+              disabled={!investmentAmount}
+            >
+              Bonds
+            </Button>
+            <Button 
+              onClick={() => {
+                if (investmentAmount) {
+                  toast({ title: "International fund!", description: `$${investmentAmount} invested globally` });
+                  setInvestmentAmount('');
+                }
+              }}
+              variant="outline"
+              className="ios-button-secondary text-xs py-2"
+              disabled={!investmentAmount}
+            >
+              International
+            </Button>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 
@@ -226,6 +336,28 @@ export default function Wealth() {
               </div>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="ios-card">
+        <h3 className="font-semibold mb-4">Budget Tools</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <Button 
+            onClick={() => toast({ title: "Budget analyzed!", description: "Spending patterns reviewed" })}
+            variant="outline"
+            className="h-16 flex-col gap-2"
+          >
+            <Calculator className="h-5 w-5" />
+            <span className="text-xs">Budget Calc</span>
+          </Button>
+          <Button 
+            onClick={() => toast({ title: "Expenses categorized!", description: "Monthly breakdown ready" })}
+            variant="outline"
+            className="h-16 flex-col gap-2"
+          >
+            <Receipt className="h-5 w-5" />
+            <span className="text-xs">Categorize</span>
+          </Button>
         </div>
       </Card>
     </div>
@@ -254,6 +386,36 @@ export default function Wealth() {
               </div>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="ios-card">
+        <h3 className="font-semibold mb-4">Goal Actions</h3>
+        <div className="space-y-2">
+          <Button 
+            onClick={() => toast({ title: "Emergency fund contribution!", description: "$500 added to emergency fund" })}
+            className="w-full justify-start"
+            variant="outline"
+          >
+            <PiggyBank className="h-4 w-4 mr-3" />
+            Boost Emergency Fund
+          </Button>
+          <Button 
+            onClick={() => toast({ title: "House fund contribution!", description: "$1000 saved for down payment" })}
+            className="w-full justify-start"
+            variant="outline"
+          >
+            <DollarSign className="h-4 w-4 mr-3" />
+            Save for House
+          </Button>
+          <Button 
+            onClick={() => toast({ title: "Retirement contribution!", description: "$2000 added to retirement" })}
+            className="w-full justify-start"
+            variant="outline"
+          >
+            <TrendingUp className="h-4 w-4 mr-3" />
+            Boost Retirement
+          </Button>
         </div>
       </Card>
     </div>
@@ -311,30 +473,30 @@ export default function Wealth() {
 
       {/* Bottom Tab Navigation - Full Width */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
-        <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+        <div className="w-full px-2 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full h-14 grid grid-cols-4 bg-muted/50 rounded-xl p-1">
               <TabsTrigger 
                 value="overview" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="investments" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
-                Investments
+                Invest
               </TabsTrigger>
               <TabsTrigger 
                 value="expenses" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Expenses
               </TabsTrigger>
               <TabsTrigger 
                 value="goals" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Goals
               </TabsTrigger>

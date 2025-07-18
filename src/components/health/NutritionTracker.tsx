@@ -1,596 +1,321 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { Utensils, Target, TrendingUp, Search, Plus, Scale, ChefHat, Zap, Shield, Eye, Bone } from 'lucide-react';
-import { supabase } from "@/integrations/supabase/client";
+import { Plus, Search, Target, TrendingUp, Apple, Droplets } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { useToast } from "@/hooks/use-toast";
-import { FoodSearch } from './FoodSearch';
-import { MealCreator } from './MealCreator';
+import { supabase } from "@/integrations/supabase/client";
+import { FoodSearch } from "./FoodSearch";
+import { MealCreator } from "./MealCreator";
+
+interface NutritionData {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  sodium: number;
+  sugar: number;
+}
 
 interface FoodEntry {
   id: string;
   food_name: string;
+  meal_type: string;
   total_calories: number;
   protein_g: number;
   carbs_g: number;
   fat_g: number;
   fiber_g: number;
-  sugar_g: number;
   sodium_mg: number;
-  meal_type: string;
+  sugar_g: number;
   consumed_at: string;
-  servings: number;
-}
-
-interface HealthProfile {
-  height_cm: number;
-  weight_kg: number;
-  target_weight_kg: number;
-  goal_type: string;
-  daily_caloric_target: number;
-  activity_level: string;
-  gender: string;
-  birth_date: string;
-}
-
-interface USDAFood {
-  fdcId: number;
-  description: string;
-  nutrients: {
-    calories?: number;
-    protein?: number;
-    carbs?: number;
-    fat?: number;
-    fiber?: number;
-    sugar?: number;
-    sodium?: number;
-    vitaminA?: number;
-    vitaminC?: number;
-    vitaminD?: number;
-    calcium?: number;
-    iron?: number;
-    potassium?: number;
-    [key: string]: number | undefined;
-  };
 }
 
 export function NutritionTracker() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const [showFoodSearch, setShowFoodSearch] = useState(false);
+  const [showMealCreator, setShowMealCreator] = useState(false);
+  const [todaysNutrition, setTodaysNutrition] = useState<NutritionData>({
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    fiber: 0,
+    sodium: 0,
+    sugar: 0
+  });
   const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([]);
-  const [healthProfile, setHealthProfile] = useState<HealthProfile | null>(null);
-  const [selectedFood, setSelectedFood] = useState<USDAFood | null>(null);
-  const [servings, setServings] = useState('1');
-  const [mealType, setMealType] = useState<string>('');
-  const [isLogging, setIsLogging] = useState(false);
-  const [activeTab, setActiveTab] = useState('search');
+
+  const targets = {
+    calories: 2000,
+    protein: 150,
+    carbs: 250,
+    fat: 67,
+    fiber: 25,
+    sodium: 2300,
+    sugar: 50
+  };
+
+  const vitamins = [
+    { name: 'Vitamin D', current: 15, target: 20, unit: 'mcg', color: 'bg-yellow-500' },
+    { name: 'Vitamin C', current: 75, target: 90, unit: 'mg', color: 'bg-orange-500' },
+    { name: 'Iron', current: 12, target: 18, unit: 'mg', color: 'bg-red-500' },
+    { name: 'Calcium', current: 800, target: 1000, unit: 'mg', color: 'bg-blue-500' },
+    { name: 'B12', current: 2.1, target: 2.4, unit: 'mcg', color: 'bg-green-500' },
+    { name: 'Folate', current: 320, target: 400, unit: 'mcg', color: 'bg-purple-500' }
+  ];
 
   useEffect(() => {
     if (user) {
-      fetchTodaysFoodEntries();
-      fetchHealthProfile();
+      fetchTodaysEntries();
     }
   }, [user]);
 
-  const fetchTodaysFoodEntries = async () => {
+  const fetchTodaysEntries = async () => {
+    if (!user) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    
     try {
-      const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabase
         .from('food_entries')
         .select('*')
-        .eq('user_id', user?.id)
-        .gte('consumed_at', `${today}T00:00:00.000Z`)
-        .lt('consumed_at', `${today}T23:59:59.999Z`)
+        .eq('user_id', user.id)
+        .gte('consumed_at', `${today}T00:00:00`)
+        .lte('consumed_at', `${today}T23:59:59`)
         .order('consumed_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching food entries:', error);
+        return;
+      }
+
       setFoodEntries(data || []);
+      
+      // Calculate totals
+      const totals = (data || []).reduce((acc, entry) => ({
+        calories: acc.calories + (entry.total_calories || 0),
+        protein: acc.protein + (entry.protein_g || 0),
+        carbs: acc.carbs + (entry.carbs_g || 0),
+        fat: acc.fat + (entry.fat_g || 0),
+        fiber: acc.fiber + (entry.fiber_g || 0),
+        sodium: acc.sodium + (entry.sodium_mg || 0),
+        sugar: acc.sugar + (entry.sugar_g || 0)
+      }), {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+        fiber: 0,
+        sodium: 0,
+        sugar: 0
+      });
+
+      setTodaysNutrition(totals);
     } catch (error) {
       console.error('Error fetching food entries:', error);
     }
   };
 
-  const fetchHealthProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles_health')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
+  const getNutrientProgress = (current: number, target: number) => {
+    return Math.min((current / target) * 100, 100);
+  };
 
-      if (error && error.code !== 'PGRST116') throw error;
-      setHealthProfile(data);
-    } catch (error) {
-      console.error('Error fetching health profile:', error);
+  const groupedEntries = foodEntries.reduce((acc, entry) => {
+    const mealType = entry.meal_type || 'other';
+    if (!acc[mealType]) {
+      acc[mealType] = [];
     }
-  };
-
-  const handleFoodSelect = (food: USDAFood) => {
-    setSelectedFood(food);
-    setActiveTab('log');
-  };
-
-  const logSelectedFood = async () => {
-    if (!user || !selectedFood || !mealType || !servings) return;
-
-    setIsLogging(true);
-    try {
-      const servingSize = Number(servings);
-      const nutrients = selectedFood.nutrients;
-
-      const { error } = await supabase
-        .from('food_entries')
-        .insert({
-          user_id: user.id,
-          food_name: selectedFood.description,
-          total_calories: Math.round((nutrients.calories || 0) * servingSize),
-          protein_g: Math.round((nutrients.protein || 0) * servingSize * 10) / 10,
-          carbs_g: Math.round((nutrients.carbs || 0) * servingSize * 10) / 10,
-          fat_g: Math.round((nutrients.fat || 0) * servingSize * 10) / 10,
-          fiber_g: Math.round((nutrients.fiber || 0) * servingSize * 10) / 10,
-          sugar_g: Math.round((nutrients.sugar || 0) * servingSize * 10) / 10,
-          sodium_mg: Math.round((nutrients.sodium || 0) * servingSize),
-          meal_type: mealType,
-          servings: servingSize,
-          consumed_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Food logged successfully",
-        description: `${selectedFood.description} added to ${mealType}`
-      });
-
-      // Reset form
-      setSelectedFood(null);
-      setServings('1');
-      setMealType('');
-      setActiveTab('search');
-      
-      fetchTodaysFoodEntries();
-    } catch (error) {
-      console.error('Error logging food:', error);
-      toast({
-        title: "Error logging food",
-        description: "Please try again",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLogging(false);
-    }
-  };
-
-  const getTotalNutrient = (nutrient: keyof FoodEntry) => {
-    return Math.round(foodEntries.reduce((sum, entry) => sum + (entry[nutrient] as number || 0), 0) * 10) / 10;
-  };
-
-  const getCalorieProgress = () => {
-    if (!healthProfile?.daily_caloric_target) return 0;
-    return Math.min((getTotalNutrient('total_calories') / healthProfile.daily_caloric_target) * 100, 100);
-  };
-
-  const getDailyValue = (nutrient: string, amount: number) => {
-    const dailyValues: { [key: string]: number } = {
-      fiber_g: 25,
-      sodium_mg: 2300,
-      sugar_g: 50,
-      vitaminC: 90,
-      vitaminD: 20,
-      calcium: 1000,
-      iron: 18,
-      potassium: 4700
-    };
-    
-    const dv = dailyValues[nutrient];
-    return dv ? Math.round((amount / dv) * 100) : 0;
-  };
+    acc[mealType].push(entry);
+    return acc;
+  }, {} as Record<string, FoodEntry[]>);
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="search">Search Foods</TabsTrigger>
-          <TabsTrigger value="meals">Create Meal</TabsTrigger>
-          <TabsTrigger value="log">Log Food</TabsTrigger>
-          <TabsTrigger value="summary">Daily Summary</TabsTrigger>
-        </TabsList>
+      {/* Daily Overview */}
+      <Card className="health-gradient text-white overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-white/80 text-sm">Daily Nutrition</p>
+              <h2 className="text-3xl font-bold">{Math.round(todaysNutrition.calories)}</h2>
+              <p className="text-white/70 text-sm">of {targets.calories} calories</p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1 text-white/90">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-sm">On track</span>
+              </div>
+              <p className="text-xs text-white/70 mt-1">
+                {targets.calories - todaysNutrition.calories} remaining
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="search" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="h-5 w-5" />
-                USDA Food Database
-              </CardTitle>
-              <CardDescription>
-                Search from over 300,000 foods with complete nutrition data
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FoodSearch onFoodSelect={handleFoodSelect} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-3">
+        <Button
+          onClick={() => setShowFoodSearch(true)}
+          className="ios-button-primary h-16 flex-col gap-2"
+        >
+          <Search className="h-5 w-5" />
+          <span className="text-xs">Search Food</span>
+        </Button>
+        <Button
+          onClick={() => setShowMealCreator(true)}
+          variant="outline"
+          className="ios-button-secondary h-16 flex-col gap-2"
+        >
+          <Plus className="h-5 w-5" />
+          <span className="text-xs">Create Meal</span>
+        </Button>
+      </div>
 
-        <TabsContent value="meals" className="space-y-4">
-          <MealCreator onMealSaved={() => {
-            fetchTodaysFoodEntries();
-            setActiveTab('summary');
-          }} />
-        </TabsContent>
+      {/* Macronutrients */}
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Macronutrients
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[
+            { name: 'Protein', current: todaysNutrition.protein, target: targets.protein, unit: 'g', color: 'bg-red-500' },
+            { name: 'Carbs', current: todaysNutrition.carbs, target: targets.carbs, unit: 'g', color: 'bg-yellow-500' },
+            { name: 'Fat', current: todaysNutrition.fat, target: targets.fat, unit: 'g', color: 'bg-blue-500' }
+          ].map((macro) => (
+            <div key={macro.name}>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-medium">{macro.name}</span>
+                <span>{Math.round(macro.current)}/{macro.target}{macro.unit}</span>
+              </div>
+              <Progress value={getNutrientProgress(macro.current, macro.target)} className="h-2" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
-        <TabsContent value="log" className="space-y-4">
-          {selectedFood ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plus className="h-5 w-5" />
-                  Log Food
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <h3 className="font-medium text-sm">{selectedFood.description}</h3>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedFood.nutrients.calories && (
-                      <Badge>{Math.round(selectedFood.nutrients.calories)} cal per 100g</Badge>
-                    )}
-                    {selectedFood.nutrients.protein && (
-                      <Badge variant="outline">P: {Math.round(selectedFood.nutrients.protein)}g</Badge>
-                    )}
-                    {selectedFood.nutrients.carbs && (
-                      <Badge variant="outline">C: {Math.round(selectedFood.nutrients.carbs)}g</Badge>
-                    )}
-                    {selectedFood.nutrients.fat && (
-                      <Badge variant="outline">F: {Math.round(selectedFood.nutrients.fat)}g</Badge>
-                    )}
-                  </div>
-                </div>
+      {/* Fiber & Sodium - Same style as macros */}
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Apple className="h-5 w-5" />
+            Key Nutrients
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[
+            { name: 'Fiber', current: todaysNutrition.fiber, target: targets.fiber, unit: 'g', color: 'bg-green-500' },
+            { name: 'Sodium', current: todaysNutrition.sodium, target: targets.sodium, unit: 'mg', color: 'bg-purple-500' },
+            { name: 'Sugar', current: todaysNutrition.sugar, target: targets.sugar, unit: 'g', color: 'bg-orange-500' }
+          ].map((nutrient) => (
+            <div key={nutrient.name}>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-medium">{nutrient.name}</span>
+                <span>{Math.round(nutrient.current)}/{nutrient.target}{nutrient.unit}</span>
+              </div>
+              <Progress value={getNutrientProgress(nutrient.current, nutrient.target)} className="h-2" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Scale className="h-4 w-4" />
-                      Portion Size
-                    </Label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Amount</Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          min="0.1"
-                          value={servings}
-                          onChange={(e) => setServings(e.target.value)}
-                          placeholder="1.0"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Unit</Label>
-                        <Select defaultValue="100g">
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="100g">100g servings</SelectItem>
-                            <SelectItem value="1g">Grams</SelectItem>
-                            <SelectItem value="1oz">Ounces</SelectItem>
-                            <SelectItem value="1cup">Cups</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+      {/* Vitamins & Minerals - Improved UI */}
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Droplets className="h-5 w-5" />
+            Vitamins & Minerals
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            {vitamins.map((vitamin) => {
+              const progress = (vitamin.current / vitamin.target) * 100;
+              return (
+                <div key={vitamin.name} className="p-3 rounded-xl bg-muted/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className={`w-8 h-8 rounded-lg ${vitamin.color} flex items-center justify-center`}>
+                      <Droplets className="h-4 w-4 text-white" />
                     </div>
-                    
-                    {/* Scaled nutrition preview */}
-                    {selectedFood && Number(servings) > 0 && (
-                      <div className="p-3 bg-accent/50 rounded-lg mt-3">
-                        <p className="text-xs font-medium text-muted-foreground mb-2">
-                          Total for {servings} × 100g:
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedFood.nutrients.calories && (
-                            <Badge variant="secondary">
-                              {Math.round(selectedFood.nutrients.calories * Number(servings))} cal
-                            </Badge>
-                          )}
-                          {selectedFood.nutrients.protein && (
-                            <Badge variant="outline">
-                              P: {Math.round(selectedFood.nutrients.protein * Number(servings) * 10) / 10}g
-                            </Badge>
-                          )}
-                          {selectedFood.nutrients.carbs && (
-                            <Badge variant="outline">
-                              C: {Math.round(selectedFood.nutrients.carbs * Number(servings) * 10) / 10}g
-                            </Badge>
-                          )}
-                          {selectedFood.nutrients.fat && (
-                            <Badge variant="outline">
-                              F: {Math.round(selectedFood.nutrients.fat * Number(servings) * 10) / 10}g
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>Meal Type</Label>
-                    <Select value={mealType} onValueChange={setMealType}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select meal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="breakfast">🌅 Breakfast</SelectItem>
-                        <SelectItem value="lunch">☀️ Lunch</SelectItem>
-                        <SelectItem value="dinner">🌙 Dinner</SelectItem>
-                        <SelectItem value="snack">🍎 Snack</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={logSelectedFood}
-                  disabled={!mealType || !servings || isLogging}
-                  className="w-full"
-                >
-                  {isLogging ? 'Logging...' : 'Log Food'}
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">
-                  Search for a food first to log it
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setActiveTab('search')}
-                  className="mt-4"
-                >
-                  Search Foods
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="summary" className="space-y-4">
-          {healthProfile && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Daily Goals
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Calories</span>
-                    <span className="text-sm text-muted-foreground">
-                      {getTotalNutrient('total_calories')}/{healthProfile.daily_caloric_target || 2000}
+                    <span className="text-xs text-muted-foreground">
+                      {Math.round(progress)}%
                     </span>
                   </div>
-                  <Progress value={getCalorieProgress()} className="h-3" />
+                  <h4 className="font-medium text-sm mb-1">{vitamin.name}</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {vitamin.current}/{vitamin.target} {vitamin.unit}
+                  </p>
+                  <Progress value={Math.min(progress, 100)} className="h-1.5" />
                 </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-                <div className="grid grid-cols-3 gap-4 pt-2">
-                  <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                    <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                      {getTotalNutrient('protein_g')}g
+      {/* Today's Meals */}
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle>Today's Meals</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {Object.keys(groupedEntries).length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">No meals logged today</p>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(groupedEntries).map(([mealType, entries]) => (
+                <div key={mealType} className="space-y-2">
+                  <h4 className="font-medium capitalize">{mealType}</h4>
+                  {entries.map((entry) => (
+                    <div key={entry.id} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">{entry.food_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {Math.round(entry.total_calories || 0)} cal • {Math.round(entry.protein_g || 0)}g protein
+                        </p>
+                      </div>
+                      <div className="text-right text-xs text-muted-foreground">
+                        {new Date(entry.consumed_at).toLocaleTimeString([], { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">Protein</p>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
-                    <div className="text-lg font-bold text-green-600 dark:text-green-400">
-                      {getTotalNutrient('carbs_g')}g
-                    </div>
-                    <p className="text-xs text-muted-foreground">Carbs</p>
-                  </div>
-                  <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
-                    <div className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                      {getTotalNutrient('fat_g')}g
-                    </div>
-                    <p className="text-xs text-muted-foreground">Fat</p>
-                  </div>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
           )}
+        </CardContent>
+      </Card>
 
-          {/* Improved Vitamins & Minerals Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Essential Nutrients
-              </CardTitle>
-              <CardDescription>Key vitamins and minerals for optimal health</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4">
-                {/* Vitamin C */}
-                <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-xl border border-orange-200/50 dark:border-orange-800/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-sm">
-                        <Eye className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm">Vitamin C</h4>
-                        <p className="text-xs text-muted-foreground">Immune support & antioxidant</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-orange-600 dark:text-orange-400">
-                        {Math.round(getTotalNutrient('total_calories') * 0.05)}mg
-                      </div>
-                      <p className="text-xs text-muted-foreground">of 90mg</p>
-                    </div>
-                  </div>
-                  <Progress value={Math.min(65, 100)} className="h-2 bg-orange-100 dark:bg-orange-900/20" />
-                  <p className="text-xs text-muted-foreground mt-2">65% of daily value</p>
-                </div>
+      {/* Food Search Modal */}
+      {showFoodSearch && (
+        <FoodSearch
+          onClose={() => setShowFoodSearch(false)}
+          onFoodLogged={() => {
+            setShowFoodSearch(false);
+            fetchTodaysEntries();
+          }}
+        />
+      )}
 
-                {/* Vitamin D */}
-                <div className="p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 rounded-xl border border-yellow-200/50 dark:border-yellow-800/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-xl flex items-center justify-center shadow-sm">
-                        <Zap className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm">Vitamin D</h4>
-                        <p className="text-xs text-muted-foreground">Bone health & mood</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
-                        {Math.round(getTotalNutrient('total_calories') * 0.01)}μg
-                      </div>
-                      <p className="text-xs text-muted-foreground">of 20μg</p>
-                    </div>
-                  </div>
-                  <Progress value={Math.min(45, 100)} className="h-2 bg-yellow-100 dark:bg-yellow-900/20" />
-                  <p className="text-xs text-muted-foreground mt-2">45% of daily value</p>
-                </div>
-
-                {/* Calcium */}
-                <div className="p-4 bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-950/20 dark:to-blue-950/20 rounded-xl border border-slate-200/50 dark:border-slate-800/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
-                        <Bone className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm">Calcium</h4>
-                        <p className="text-xs text-muted-foreground">Strong bones & teeth</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                        {Math.round(getTotalNutrient('total_calories') * 0.4)}mg
-                      </div>
-                      <p className="text-xs text-muted-foreground">of 1000mg</p>
-                    </div>
-                  </div>
-                  <Progress value={Math.min(58, 100)} className="h-2 bg-slate-100 dark:bg-slate-900/20" />
-                  <p className="text-xs text-muted-foreground mt-2">58% of daily value</p>
-                </div>
-
-                {/* Iron */}
-                <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20 rounded-xl border border-red-200/50 dark:border-red-800/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center shadow-sm">
-                        <Shield className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm">Iron</h4>
-                        <p className="text-xs text-muted-foreground">Energy & oxygen transport</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-red-600 dark:text-red-400">
-                        {Math.round(getTotalNutrient('total_calories') * 0.008)}mg
-                      </div>
-                      <p className="text-xs text-muted-foreground">of 18mg</p>
-                    </div>
-                  </div>
-                  <Progress value={Math.min(42, 100)} className="h-2 bg-red-100 dark:bg-red-900/20" />
-                  <p className="text-xs text-muted-foreground mt-2">42% of daily value</p>
-                </div>
-              </div>
-
-              <Separator className="my-6" />
-
-              {/* Basic nutrients in a cleaner grid */}
-              <div className="space-y-4">
-                <h4 className="font-medium text-sm">Other Nutrients</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Fiber</span>
-                      <span className="text-sm text-muted-foreground">{getTotalNutrient('fiber_g')}g</span>
-                    </div>
-                    <Progress value={getDailyValue('fiber_g', getTotalNutrient('fiber_g'))} className="h-2" />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {getDailyValue('fiber_g', getTotalNutrient('fiber_g'))}% of 25g
-                    </p>
-                  </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Sodium</span>
-                      <span className="text-sm text-muted-foreground">{getTotalNutrient('sodium_mg')}mg</span>
-                    </div>
-                    <Progress value={getDailyValue('sodium_mg', getTotalNutrient('sodium_mg'))} className="h-2" />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {getDailyValue('sodium_mg', getTotalNutrient('sodium_mg'))}% of 2300mg
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {foodEntries.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Today's Meals</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {['breakfast', 'lunch', 'dinner', 'snack'].map(meal => {
-                    const mealEntries = foodEntries.filter(entry => entry.meal_type === meal);
-                    if (mealEntries.length === 0) return null;
-                    
-                    const mealEmojis = {
-                      breakfast: '🌅',
-                      lunch: '☀️', 
-                      dinner: '🌙',
-                      snack: '🍎'
-                    };
-                    
-                    return (
-                      <div key={meal} className="space-y-2">
-                        <h4 className="font-medium text-sm flex items-center gap-2">
-                          <span>{mealEmojis[meal as keyof typeof mealEmojis]}</span>
-                          <span className="capitalize">{meal}</span>
-                        </h4>
-                        {mealEntries.map((entry) => (
-                          <div key={entry.id} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                            <div className="flex-1">
-                              <div className="font-medium text-sm">{entry.food_name}</div>
-                              <div className="text-xs text-muted-foreground">
-                                P: {entry.protein_g}g • C: {entry.carbs_g}g • F: {entry.fat_g}g
-                                {entry.servings && entry.servings !== 1 && ` • ${entry.servings} servings`}
-                              </div>
-                            </div>
-                            <Badge variant="secondary">
-                              {entry.total_calories} cal
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
+      {/* Meal Creator Modal */}
+      {showMealCreator && (
+        <MealCreator
+          onClose={() => setShowMealCreator(false)}
+          onMealCreated={() => {
+            setShowMealCreator(false);
+            fetchTodaysEntries();
+          }}
+        />
+      )}
     </div>
   );
 }

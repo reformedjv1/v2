@@ -1,13 +1,15 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   TrendingUp, 
   Calendar,
   Target,
-  BarChart3,
   Settings,
   ArrowLeft,
   MessageCircle,
@@ -16,13 +18,21 @@ import {
   Clock,
   Heart,
   Zap,
-  Brain
+  Brain,
+  Phone,
+  Mail,
+  Video,
+  Gift
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Relations() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  const [gratitudeText, setGratitudeText] = useState('');
+  const [connectionNote, setConnectionNote] = useState('');
 
   const relationshipMetrics = [
     { label: 'Connection Score', value: 92, unit: '/100', icon: Heart, color: 'bg-red-500', trend: '+8%' },
@@ -32,10 +42,34 @@ export default function Relations() {
   ];
 
   const quickActions = [
-    { label: 'Gratitude Journal', icon: Heart, action: () => {} },
-    { label: 'Send Message', icon: MessageCircle, action: () => {} },
-    { label: 'Schedule Time', icon: Calendar, action: () => {} },
-    { label: 'Express Love', icon: Users, action: () => {} }
+    { 
+      label: 'Send Message', 
+      icon: MessageCircle, 
+      action: () => {
+        toast({ title: "Message sent!", description: "Reached out to a loved one" });
+      }
+    },
+    { 
+      label: 'Schedule Call', 
+      icon: Phone, 
+      action: () => {
+        toast({ title: "Call scheduled!", description: "Quality time planned" });
+      }
+    },
+    { 
+      label: 'Video Chat', 
+      icon: Video, 
+      action: () => {
+        toast({ title: "Video call started!", description: "Connecting face-to-face" });
+      }
+    },
+    { 
+      label: 'Send Gift', 
+      icon: Gift, 
+      action: () => {
+        toast({ title: "Gift idea noted!", description: "Thoughtful gesture planned" });
+      }
+    }
   ];
 
   const todaysGoals = [
@@ -63,6 +97,26 @@ export default function Relations() {
     { title: 'Conflict Resolution', description: 'Learn healthy dispute techniques', time: '15 min', completed: true },
     { title: 'Emotional Intelligence', description: 'Build empathy and awareness', time: '20 min', completed: false }
   ];
+
+  const handleGratitudeSubmit = () => {
+    if (gratitudeText.trim()) {
+      toast({
+        title: "Gratitude logged!",
+        description: "Your appreciation has been recorded."
+      });
+      setGratitudeText('');
+    }
+  };
+
+  const handleConnectionNote = () => {
+    if (connectionNote.trim()) {
+      toast({
+        title: "Connection noted!",
+        description: "Your relationship insight has been saved."
+      });
+      setConnectionNote('');
+    }
+  };
 
   const renderOverview = () => (
     <div className="space-y-6">
@@ -180,6 +234,74 @@ export default function Relations() {
     </div>
   );
 
+  const renderConnections = () => (
+    <div className="space-y-4">
+      <Card className="ios-card">
+        <h3 className="font-semibold mb-4">Express Gratitude</h3>
+        <div className="space-y-3">
+          <Textarea
+            placeholder="Write something you're grateful for about someone special..."
+            value={gratitudeText}
+            onChange={(e) => setGratitudeText(e.target.value)}
+            className="min-h-20"
+          />
+          <Button 
+            onClick={handleGratitudeSubmit}
+            className="w-full ios-button-primary"
+            disabled={!gratitudeText.trim()}
+          >
+            <Heart className="h-4 w-4 mr-2" />
+            Share Gratitude
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="ios-card">
+        <h3 className="font-semibold mb-4">Connection Insights</h3>
+        <div className="space-y-3">
+          <Textarea
+            placeholder="Reflect on a meaningful interaction today..."
+            value={connectionNote}
+            onChange={(e) => setConnectionNote(e.target.value)}
+            className="min-h-20"
+          />
+          <Button 
+            onClick={handleConnectionNote}
+            variant="outline"
+            className="w-full ios-button-secondary"
+            disabled={!connectionNote.trim()}
+          >
+            <Brain className="h-4 w-4 mr-2" />
+            Save Reflection
+          </Button>
+        </div>
+      </Card>
+
+      {/* Contact List with Actions */}
+      <Card className="ios-card">
+        <h3 className="font-semibold mb-4">Quick Connect</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { name: 'Mom', emoji: '👵', action: () => toast({ title: "Called Mom!", description: "Quality time scheduled" }) },
+            { name: 'Best Friend', emoji: '👫', action: () => toast({ title: "Texted friend!", description: "Check-in message sent" }) },
+            { name: 'Partner', emoji: '💕', action: () => toast({ title: "Date planned!", description: "Romantic evening scheduled" }) },
+            { name: 'Sibling', emoji: '👨‍👩‍👧', action: () => toast({ title: "Family time!", description: "Catch-up call made" }) }
+          ].map((contact) => (
+            <Button
+              key={contact.name}
+              variant="outline"
+              className="h-20 flex-col gap-2 p-4"
+              onClick={contact.action}
+            >
+              <div className="text-2xl">{contact.emoji}</div>
+              <span className="text-xs">{contact.name}</span>
+            </Button>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+
   const renderActivities = () => (
     <div className="space-y-4">
       <Card className="ios-card">
@@ -201,6 +323,29 @@ export default function Relations() {
               </div>
               {activity.completed && <span className="text-xs text-green-600 font-medium">Done</span>}
             </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Interactive Activities */}
+      <Card className="ios-card">
+        <h3 className="font-semibold mb-4">Relationship Builders</h3>
+        <div className="space-y-3">
+          {[
+            { title: 'Send Appreciation', action: () => toast({ title: "Appreciation sent!", description: "Made someone's day brighter" }) },
+            { title: 'Plan Quality Time', action: () => toast({ title: "Time blocked!", description: "Quality time scheduled" }) },
+            { title: 'Practice Active Listening', action: () => toast({ title: "Mindful listening!", description: "Attention focused on others" }) },
+            { title: 'Share a Memory', action: () => toast({ title: "Memory shared!", description: "Beautiful moment reconnected" }) }
+          ].map((activity, index) => (
+            <Button
+              key={index}
+              variant="outline"
+              className="w-full justify-start h-12"
+              onClick={activity.action}
+            >
+              <Heart className="h-4 w-4 mr-3" />
+              {activity.title}
+            </Button>
           ))}
         </div>
       </Card>
@@ -227,7 +372,11 @@ export default function Relations() {
                   Completed
                 </div>
               ) : (
-                <Button size="sm" className="ios-button-primary w-full haptic-medium">
+                <Button 
+                  size="sm" 
+                  className="ios-button-primary w-full haptic-medium"
+                  onClick={() => toast({ title: `Started ${module.title}!`, description: "Learning module in progress" })}
+                >
                   <BookOpen className="h-3 w-3 mr-1" />
                   Start Module
                 </Button>
@@ -276,7 +425,7 @@ export default function Relations() {
           </TabsContent>
 
           <TabsContent value="connections" className="mt-0">
-            {renderOverview()}
+            {renderConnections()}
           </TabsContent>
 
           <TabsContent value="activities" className="mt-0">
@@ -291,30 +440,30 @@ export default function Relations() {
 
       {/* Bottom Tab Navigation - Full Width */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
-        <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+        <div className="w-full px-2 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full h-14 grid grid-cols-4 bg-muted/50 rounded-xl p-1">
               <TabsTrigger 
                 value="overview" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="connections" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
-                Connections
+                Connect
               </TabsTrigger>
               <TabsTrigger 
                 value="activities" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Activities
               </TabsTrigger>
               <TabsTrigger 
                 value="growth" 
-                className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
                 Growth
               </TabsTrigger>

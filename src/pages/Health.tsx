@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -225,7 +226,7 @@ export default function Health() {
   );
 
   const isWoman = userGender === 'female';
-  const tabsCount = isWoman ? 6 : 5; // Include mental health + women's health if applicable
+  const tabsCount = isWoman ? 6 : 5;
 
   return (
     <div className="min-h-screen bg-background safe-area-top safe-area-bottom ios-scroll">
@@ -287,73 +288,51 @@ export default function Health() {
         </Tabs>
       </div>
 
-      {/* Bottom Tab Navigation - Full Width */}
+      {/* Bottom Tab Navigation - Fixed Horizontal Layout */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
         <div className="w-full px-2 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
-          <div className={`w-full h-14 grid grid-cols-${tabsCount} bg-muted/50 rounded-xl p-1`}>
-            <button 
-              onClick={() => setActiveTab('overview')}
-              className={`flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg ${
-                activeTab === 'overview' 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Overview
-            </button>
-            <button 
-              onClick={() => setActiveTab('nutrition')}
-              className={`flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg ${
-                activeTab === 'nutrition' 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Nutrition
-            </button>
-            <button 
-              onClick={() => setActiveTab('fitness')}
-              className={`flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg ${
-                activeTab === 'fitness' 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Fitness
-            </button>
-            <button 
-              onClick={() => setActiveTab('sleep')}
-              className={`flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg ${
-                activeTab === 'sleep' 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Sleep
-            </button>
-            <button 
-              onClick={() => setActiveTab('mental-health')}
-              className={`flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg ${
-                activeTab === 'mental-health' 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Mental
-            </button>
-            {isWoman && (
-              <button 
-                onClick={() => setActiveTab('womens-health')}
-                className={`flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg ${
-                  activeTab === 'womens-health' 
-                    ? 'bg-primary text-primary-foreground shadow-sm' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className={`w-full h-14 grid grid-cols-${tabsCount} bg-muted/50 rounded-xl p-1`}>
+              <TabsTrigger 
+                value="overview" 
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
-                Women's
-              </button>
-            )}
-          </div>
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="nutrition" 
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Nutrition
+              </TabsTrigger>
+              <TabsTrigger 
+                value="fitness" 
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Fitness
+              </TabsTrigger>
+              <TabsTrigger 
+                value="sleep" 
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Sleep
+              </TabsTrigger>
+              <TabsTrigger 
+                value="mental-health" 
+                className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+              >
+                Mental
+              </TabsTrigger>
+              {isWoman && (
+                <TabsTrigger 
+                  value="womens-health" 
+                  className="flex-1 py-3 px-1 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
+                  Women's
+                </TabsTrigger>
+              )}
+            </TabsList>
+          </Tabs>
         </div>
       </div>
     </div>

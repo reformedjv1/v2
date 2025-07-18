@@ -1,162 +1,48 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  User, 
   ArrowLeft, 
   Settings, 
   Crown, 
-  Check, 
-  Star,
-  Shield,
-  Zap,
+  Star, 
+  Calendar, 
+  Award,
+  TrendingUp,
+  Heart,
   Target,
-  Calendar,
-  Mail,
-  Phone,
-  MapPin,
-  Edit,
-  Save,
-  LogOut,
+  Zap,
   Bell,
-  Lock,
-  CreditCard,
-  Gift,
-  HelpCircle
+  Shield,
+  LogOut
 } from 'lucide-react';
-import { useAuth } from '@/components/AuthProvider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from "@/hooks/use-toast";
 
-interface UserProfile {
-  id: string;
-  user_id: string;
+interface Profile {
   first_name: string | null;
   last_name: string | null;
-  tier: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface HealthProfile {
-  height_cm: number | null;
-  weight_kg: number | null;
-  target_weight_kg: number | null;
-  goal_type: string | null;
-  activity_level: string | null;
-  gender: string | null;
-  birth_date: string | null;
+  tier: string | null;
 }
 
 export default function Profile() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('profile');
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [healthProfile, setHealthProfile] = useState<HealthProfile>({
-    height_cm: null,
-    weight_kg: null,
-    target_weight_kg: null,
-    goal_type: null,
-    activity_level: null,
-    gender: null,
-    birth_date: null
-  });
-
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    location: ''
-  });
-
-  const plans = [
-    {
-      id: 'Free',
-      name: 'Free',
-      price: '$0',
-      period: 'forever',
-      icon: Gift,
-      color: 'bg-gray-500',
-      features: [
-        'Basic health tracking',
-        'Simple goal setting',
-        'Weekly insights',
-        'Community access'
-      ],
-      limits: 'Limited features'
-    },
-    {
-      id: 'Premium',
-      name: 'Premium',
-      price: '$9.99',
-      period: 'month',
-      icon: Star,
-      color: 'bg-blue-500',
-      features: [
-        'Advanced analytics',
-        'Personalized recommendations',
-        'Daily insights',
-        'Priority support',
-        'Export data',
-        'Custom goals'
-      ],
-      limits: 'Full access',
-      popular: true
-    },
-    {
-      id: 'Advanced',
-      name: 'Advanced',
-      price: '$19.99',
-      period: 'month',
-      icon: Zap,
-      color: 'bg-purple-500',
-      features: [
-        'AI-powered coaching',
-        'Real-time optimization',
-        'Advanced integrations',
-        'Custom meal plans',
-        'Workout programs',
-        'Health consultations'
-      ],
-      limits: 'Premium + AI features'
-    },
-    {
-      id: 'Elite',
-      name: 'Elite',
-      price: '$39.99',
-      period: 'month',
-      icon: Crown,
-      color: 'bg-gold-500',
-      features: [
-        'Personal health coach',
-        'Custom optimization plans',
-        'Priority everything',
-        'Unlimited features',
-        'White-glove support',
-        'Early access to features'
-      ],
-      limits: 'Everything included'
-    }
-  ];
+  const [activeTab, setActiveTab] = useState('overview');
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
-      fetchHealthProfile();
     }
   }, [user]);
 
@@ -164,149 +50,20 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('first_name, last_name, tier')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
-      
-      if (data) {
-        setProfile(data);
-        setFormData({
-          firstName: data.first_name || '',
-          lastName: data.last_name || '',
-          email: user?.email || '',
-          phone: '',
-          location: ''
-        });
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
+        return;
       }
+
+      setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
-    }
-  };
-
-  const fetchHealthProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles_health')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      
-      if (data) {
-        setHealthProfile({
-          height_cm: data.height_cm,
-          weight_kg: data.weight_kg,
-          target_weight_kg: data.target_weight_kg,
-          goal_type: data.goal_type,
-          activity_level: data.activity_level,
-          gender: data.gender,
-          birth_date: data.birth_date
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching health profile:', error);
-    }
-  };
-
-  const updateProfile = async () => {
-    if (!user) return;
-
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: user.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been saved successfully."
-      });
-
-      setIsEditing(false);
-      fetchProfile();
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Error updating profile",
-        description: "Please try again",
-        variant: "destructive"
-      });
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateHealthProfile = async () => {
-    if (!user) return;
-
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('user_profiles_health')
-        .upsert({
-          user_id: user.id,
-          ...healthProfile,
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Health profile updated",
-        description: "Your health information has been saved."
-      });
-    } catch (error) {
-      console.error('Error updating health profile:', error);
-      toast({
-        title: "Error updating health profile",
-        description: "Please try again",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateTier = async (newTier: string) => {
-    if (!user) return;
-
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          tier: newTier,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Plan updated",
-        description: `Successfully upgraded to ${newTier} plan!`
-      });
-
-      fetchProfile();
-    } catch (error) {
-      console.error('Error updating tier:', error);
-      toast({
-        title: "Error updating plan",
-        description: "Please try again",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -314,364 +71,251 @@ export default function Profile() {
     try {
       await signOut();
       navigate('/auth');
+      toast({
+        title: "Signed out successfully",
+        description: "Come back soon!"
+      });
     } catch (error) {
-      console.error('Error signing out:', error);
+      toast({
+        title: "Error signing out",
+        description: "Please try again"
+      });
     }
   };
 
-  const calculateAge = () => {
-    if (!healthProfile.birth_date) return null;
-    const today = new Date();
-    const birthDate = new Date(healthProfile.birth_date);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
+  const stats = [
+    { label: 'Health Score', value: 82, unit: '/100', color: 'text-green-600', icon: Heart },
+    { label: 'Wealth Score', value: 91, unit: '/100', color: 'text-blue-600', icon: TrendingUp },
+    { label: 'Relations Score', value: 89, unit: '/100', color: 'text-purple-600', icon: Target },
+    { label: 'Overall Wellness', value: 87, unit: '/100', color: 'text-orange-600', icon: Star }
+  ];
 
-  const calculateBMI = () => {
-    if (!healthProfile.height_cm || !healthProfile.weight_kg) return null;
-    const heightM = healthProfile.height_cm / 100;
-    return Math.round((healthProfile.weight_kg / (heightM * heightM)) * 10) / 10;
-  };
+  const achievements = [
+    { title: 'First Week Complete', emoji: '🎯', description: 'Completed your first week of tracking', earned: true },
+    { title: 'Health Master', emoji: '💚', description: 'Maintained 80+ health score for 5 days', earned: true },
+    { title: 'Wealth Builder', emoji: '💎', description: 'Set up your first financial goal', earned: true },
+    { title: 'Social Butterfly', emoji: '🤝', description: 'Connected with 3 different people this week', earned: false },
+    { title: 'Consistency King', emoji: '👑', description: 'Track daily for 30 days straight', earned: false },
+    { title: 'Triple Threat', emoji: '⭐', description: 'Score 90+ in all three pillars', earned: false }
+  ];
 
-  const renderProfileTab = () => (
+  const renderOverview = () => (
     <div className="space-y-6">
       {/* Profile Header */}
-      <Card className="ios-card">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
-            <User className="h-10 w-10 text-primary" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-xl font-bold">
-              {profile?.first_name} {profile?.last_name}
-            </h2>
-            <p className="text-muted-foreground">{user?.email}</p>
-            <div className="flex items-center gap-2 mt-2">
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Crown className="h-3 w-3" />
-                {profile?.tier || 'Free'}
-              </Badge>
-              <span className="text-xs text-muted-foreground">
-                Member since {profile?.created_at ? new Date(profile.created_at).getFullYear() : '2024'}
-              </span>
+      <Card className="ios-card bg-gradient-to-br from-primary/10 to-primary/5">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20">
+              <AvatarFallback className="text-2xl bg-primary/20">
+                {profile?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold">
+                {profile?.first_name && profile?.last_name 
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : user?.email?.split('@')[0] || 'User'
+                }
+              </h2>
+              <p className="text-muted-foreground">{user?.email}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Crown className="h-3 w-3" />
+                  Free Plan
+                </Badge>
+                <Badge variant="outline">Member since Dec 2024</Badge>
+              </div>
             </div>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setIsEditing(!isEditing)}
-            className="haptic-light"
-          >
-            {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-          </Button>
-        </div>
+        </CardContent>
+      </Card>
 
-        {isEditing && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                  className="ios-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                  className="ios-input"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                disabled
-                className="ios-input"
-              />
-            </div>
-            <Button
-              onClick={updateProfile}
-              disabled={isLoading}
-              className="ios-button-primary w-full haptic-medium"
+      {/* Quick Stats */}
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5" />
+            Your Wellness Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div key={index} className="text-center p-4 rounded-xl bg-muted/30">
+                  <Icon className={`h-6 w-6 mx-auto mb-2 ${stat.color}`} />
+                  <div className="text-2xl font-bold">{stat.value}<span className="text-sm text-muted-foreground">{stat.unit}</span></div>
+                  <div className="text-xs text-muted-foreground">{stat.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-3">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => navigate('/health')}
             >
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              <Heart className="h-5 w-5" />
+              <span className="text-xs">Health Hub</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => navigate('/wealth')}
+            >
+              <TrendingUp className="h-5 w-5" />
+              <span className="text-xs">Wealth Center</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => navigate('/relations')}
+            >
+              <Target className="h-5 w-5" />
+              <span className="text-xs">Relations</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => toast({ title: "Settings", description: "Settings panel coming soon!" })}
+            >
+              <Settings className="h-5 w-5" />
+              <span className="text-xs">Settings</span>
             </Button>
           </div>
-        )}
+        </CardContent>
       </Card>
+    </div>
+  );
 
-      {/* Health Stats */}
+  const renderAchievements = () => (
+    <div className="space-y-4">
       <Card className="ios-card">
-        <h3 className="font-semibold mb-4">Health Profile</h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="gender">Gender</Label>
-              <Select 
-                value={healthProfile.gender || ''} 
-                onValueChange={(value) => setHealthProfile({...healthProfile, gender: value})}
-              >
-                <SelectTrigger className="ios-input">
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="birthDate">Birth Date</Label>
-              <Input
-                id="birthDate"
-                type="date"
-                value={healthProfile.birth_date || ''}
-                onChange={(e) => setHealthProfile({...healthProfile, birth_date: e.target.value})}
-                className="ios-input"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="height">Height (cm)</Label>
-              <Input
-                id="height"
-                type="number"
-                placeholder="170"
-                value={healthProfile.height_cm || ''}
-                onChange={(e) => setHealthProfile({...healthProfile, height_cm: Number(e.target.value)})}
-                className="ios-input"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="weight">Weight (kg)</Label>
-              <Input
-                id="weight"
-                type="number"
-                step="0.1"
-                placeholder="70.0"
-                value={healthProfile.weight_kg || ''}
-                onChange={(e) => setHealthProfile({...healthProfile, weight_kg: Number(e.target.value)})}
-                className="ios-input"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="targetWeight">Target Weight (kg)</Label>
-              <Input
-                id="targetWeight"
-                type="number"
-                step="0.1"
-                placeholder="65.0"
-                value={healthProfile.target_weight_kg || ''}
-                onChange={(e) => setHealthProfile({...healthProfile, target_weight_kg: Number(e.target.value)})}
-                className="ios-input"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="goalType">Goal</Label>
-              <Select 
-                value={healthProfile.goal_type || ''} 
-                onValueChange={(value) => setHealthProfile({...healthProfile, goal_type: value})}
-              >
-                <SelectTrigger className="ios-input">
-                  <SelectValue placeholder="Select goal" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="lose">Lose Weight</SelectItem>
-                  <SelectItem value="maintain">Maintain Weight</SelectItem>
-                  <SelectItem value="gain">Gain Weight</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="activityLevel">Activity Level</Label>
-            <Select 
-              value={healthProfile.activity_level || ''} 
-              onValueChange={(value) => setHealthProfile({...healthProfile, activity_level: value})}
-            >
-              <SelectTrigger className="ios-input">
-                <SelectValue placeholder="Select activity level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sedentary">Sedentary</SelectItem>
-                <SelectItem value="light">Light Activity</SelectItem>
-                <SelectItem value="moderate">Moderate Activity</SelectItem>
-                <SelectItem value="active">Very Active</SelectItem>
-                <SelectItem value="very_active">Extremely Active</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Health Metrics Display */}
-          {(healthProfile.height_cm && healthProfile.weight_kg) && (
-            <div className="grid grid-cols-3 gap-3 mt-4">
-              <div className="text-center p-3 bg-muted/30 rounded-xl">
-                <div className="text-lg font-bold">{calculateAge() || 'N/A'}</div>
-                <div className="text-xs text-muted-foreground">Age</div>
-              </div>
-              <div className="text-center p-3 bg-muted/30 rounded-xl">
-                <div className="text-lg font-bold">{calculateBMI() || 'N/A'}</div>
-                <div className="text-xs text-muted-foreground">BMI</div>
-              </div>
-              <div className="text-center p-3 bg-muted/30 rounded-xl">
-                <div className="text-lg font-bold">
-                  {healthProfile.target_weight_kg && healthProfile.weight_kg 
-                    ? Math.abs(healthProfile.weight_kg - healthProfile.target_weight_kg).toFixed(1)
-                    : 'N/A'
-                  }kg
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Award className="h-5 w-5" />
+            Achievements
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {achievements.map((achievement, index) => (
+              <div key={index} className={`p-4 rounded-xl border-2 ${
+                achievement.earned ? 'border-primary bg-primary/5' : 'border-muted bg-muted/20'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <div className={`text-2xl ${achievement.earned ? '' : 'grayscale opacity-50'}`}>
+                    {achievement.emoji}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={`font-medium ${achievement.earned ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {achievement.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                  </div>
+                  {achievement.earned && (
+                    <Badge variant="default" className="text-xs">
+                      Earned
+                    </Badge>
+                  )}
                 </div>
-                <div className="text-xs text-muted-foreground">To Goal</div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-          <Button
-            onClick={updateHealthProfile}
-            disabled={isLoading}
-            className="ios-button-primary w-full haptic-medium"
+  const renderSettings = () => (
+    <div className="space-y-4">
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle>Account Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start h-12"
+            onClick={() => toast({ title: "Profile editor", description: "Profile editing coming soon!" })}
           >
-            {isLoading ? 'Saving...' : 'Save Health Profile'}
+            <Settings className="h-4 w-4 mr-3" />
+            Edit Profile
           </Button>
-        </div>
+          <Button 
+            variant="outline" 
+            className="w-full justify-start h-12"
+            onClick={() => toast({ title: "Notifications", description: "Notification settings coming soon!" })}
+          >
+            <Bell className="h-4 w-4 mr-3" />
+            Notifications
+          </Button>
+          <Button 
+            variant="outline" 
+            className="w-full justify-start h-12"
+            onClick={() => toast({ title: "Privacy", description: "Privacy settings coming soon!" })}
+          >
+            <Shield className="h-4 w-4 mr-3" />
+            Privacy & Security
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="ios-card">
+        <CardHeader>
+          <CardTitle>Subscription</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-6">
+            <Crown className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="font-semibold mb-2">Free Plan</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              You're currently on the free plan with access to basic features.
+            </p>
+            <Badge variant="secondary" className="mb-4">Coming Soon</Badge>
+            <p className="text-xs text-muted-foreground">
+              Premium plans with advanced features will be available soon!
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="ios-card border-red-200 dark:border-red-900">
+        <CardContent className="p-4">
+          <Button 
+            variant="destructive" 
+            className="w-full"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </CardContent>
       </Card>
     </div>
   );
 
-  const renderPlansTab = () => (
-    <div className="space-y-4">
-      {plans.map((plan) => {
-        const Icon = plan.icon;
-        const isCurrentPlan = profile?.tier === plan.id;
-        
-        return (
-          <Card key={plan.id} className={`ios-card relative ${isCurrentPlan ? 'ring-2 ring-primary' : ''}`}>
-            {plan.popular && (
-              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-3 py-1">
-                  Most Popular
-                </Badge>
-              </div>
-            )}
-            
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 ${plan.color} rounded-xl flex items-center justify-center`}>
-                  <Icon className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">{plan.name}</h3>
-                  <p className="text-muted-foreground text-sm">{plan.limits}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold">{plan.price}</div>
-                <div className="text-xs text-muted-foreground">/{plan.period}</div>
-              </div>
-            </div>
-
-            <div className="space-y-2 mb-4">
-              {plan.features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span>{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            {isCurrentPlan ? (
-              <Button disabled className="ios-button-secondary w-full">
-                <Check className="h-4 w-4 mr-2" />
-                Current Plan
-              </Button>
-            ) : (
-              <Button
-                onClick={() => updateTier(plan.id)}
-                disabled={isLoading}
-                className="ios-button-primary w-full haptic-medium"
-              >
-                {plan.id === 'Free' ? 'Downgrade' : 'Upgrade'} to {plan.name}
-              </Button>
-            )}
-          </Card>
-        );
-      })}
-    </div>
-  );
-
-  const renderSettingsTab = () => (
-    <div className="space-y-4">
-      {/* Account Settings */}
-      <Card className="ios-card">
-        <h3 className="font-semibold mb-4">Account Settings</h3>
-        <div className="space-y-3">
-          <div className="ios-list-item haptic-selection">
-            <Bell className="h-5 w-5 text-muted-foreground mr-3" />
-            <span className="flex-1">Notifications</span>
-            <div className="w-6 h-6 bg-primary rounded-full"></div>
-          </div>
-          <div className="ios-list-item haptic-selection">
-            <Lock className="h-5 w-5 text-muted-foreground mr-3" />
-            <span className="flex-1">Privacy & Security</span>
-            <span className="text-muted-foreground">{'>'}</span>
-          </div>
-          <div className="ios-list-item haptic-selection">
-            <CreditCard className="h-5 w-5 text-muted-foreground mr-3" />
-            <span className="flex-1">Billing & Payments</span>
-            <span className="text-muted-foreground">{'>'}</span>
-          </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading profile...</p>
         </div>
-      </Card>
-
-      {/* Support */}
-      <Card className="ios-card">
-        <h3 className="font-semibold mb-4">Support</h3>
-        <div className="space-y-3">
-          <div className="ios-list-item haptic-selection">
-            <HelpCircle className="h-5 w-5 text-muted-foreground mr-3" />
-            <span className="flex-1">Help Center</span>
-            <span className="text-muted-foreground">{'>'}</span>
-          </div>
-          <div className="ios-list-item haptic-selection">
-            <Mail className="h-5 w-5 text-muted-foreground mr-3" />
-            <span className="flex-1">Contact Support</span>
-            <span className="text-muted-foreground">{'>'}</span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Sign Out */}
-      <Card className="ios-card">
-        <Button
-          onClick={handleSignOut}
-          variant="destructive"
-          className="w-full haptic-medium"
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Sign Out
-        </Button>
-      </Card>
-    </div>
-  );
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background safe-area-top safe-area-bottom ios-scroll">
@@ -688,48 +332,53 @@ export default function Profile() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <div className="ios-large-title">Profile</div>
+              <div className="ios-large-title">Profile 👤</div>
               <p className="text-sm text-muted-foreground">Manage your account</p>
             </div>
           </div>
-          <Button size="sm" variant="ghost" className="h-10 w-10 p-0 haptic-light">
-            <Settings className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" className="h-10 w-10 p-0 haptic-light">
+              <Calendar className="h-4 w-4" />
+            </Button>
+            <Button size="sm" variant="ghost" className="h-10 w-10 p-0 haptic-light">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
       <div className="px-4 safe-area-left safe-area-right pb-32">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsContent value="profile" className="mt-0">
-            {renderProfileTab()}
+          <TabsContent value="overview" className="mt-0">
+            {renderOverview()}
           </TabsContent>
 
-          <TabsContent value="plans" className="mt-0">
-            {renderPlansTab()}
+          <TabsContent value="achievements" className="mt-0">
+            {renderAchievements()}
           </TabsContent>
 
           <TabsContent value="settings" className="mt-0">
-            {renderSettingsTab()}
+            {renderSettings()}
           </TabsContent>
         </Tabs>
       </div>
 
       {/* Bottom Tab Navigation - Full Width */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/30">
-        <div className="w-full px-4 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+        <div className="w-full px-2 py-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full h-14 grid grid-cols-3 bg-muted/50 rounded-xl p-1">
               <TabsTrigger 
-                value="profile" 
+                value="overview" 
                 className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
-                Profile
+                Overview
               </TabsTrigger>
               <TabsTrigger 
-                value="plans" 
+                value="achievements" 
                 className="flex-1 py-3 px-2 text-xs font-medium transition-all duration-200 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
               >
-                Plans
+                Achievements
               </TabsTrigger>
               <TabsTrigger 
                 value="settings" 
