@@ -56,6 +56,7 @@ export function MentalHealth() {
   const [copingStrategies, setCopingStrategies] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   const commonActivities = [
     'Exercise', 'Reading', 'Meditation', 'Socializing', 'Work', 'Hobbies',
@@ -96,10 +97,13 @@ export function MentalHealth() {
   };
 
   const logMentalHealth = async () => {
-    if (!user) return;
+    if (!user || !selectedDate) return;
 
     setIsLoading(true);
     try {
+      const loggedAt = new Date(selectedDate);
+      loggedAt.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0);
+
       const { error } = await supabase
         .from('mental_health_logs')
         .insert({
@@ -114,7 +118,7 @@ export function MentalHealth() {
           triggers: triggers.length > 0 ? triggers : null,
           coping_strategies: copingStrategies.length > 0 ? copingStrategies : null,
           notes: notes || null,
-          logged_at: new Date().toISOString()
+          logged_at: loggedAt.toISOString()
         });
 
       if (error) throw error;
@@ -203,6 +207,18 @@ export function MentalHealth() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Mood Rating */}
+          <div className="space-y-3">
+            <Label htmlFor="log-date" className="text-sm font-medium">Date</Label>
+            <Input
+              id="log-date"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="h-12"
+              max={new Date().toISOString().split('T')[0]}
+            />
+          </div>
+
           <div className="space-y-3">
             <Label className="text-sm font-medium flex items-center gap-2">
               {getMoodIcon(moodRating)}
@@ -332,7 +348,7 @@ export function MentalHealth() {
             <Label htmlFor="thoughts" className="text-sm font-medium">Current Thoughts</Label>
             <Textarea
               id="thoughts"
-              placeholder="How are you feeling today? What's on your mind?"
+              placeholder="How are you feeling? What's on your mind?"
               value={thoughts}
               onChange={(e) => setThoughts(e.target.value)}
               className="min-h-[80px] resize-none"
@@ -398,7 +414,7 @@ export function MentalHealth() {
             <Label htmlFor="notes" className="text-sm font-medium">Additional Notes</Label>
             <Textarea
               id="notes"
-              placeholder="Any additional thoughts or observations..."
+              placeholder="Additional thoughts or observations..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="min-h-[60px] resize-none"
@@ -408,7 +424,7 @@ export function MentalHealth() {
           {/* Log Button */}
           <Button 
             onClick={logMentalHealth} 
-            disabled={isLoading}
+            disabled={!selectedDate || isLoading}
             className="w-full h-12 text-base font-medium"
             size="lg"
           >

@@ -182,13 +182,13 @@ export default function Wealth() {
         <h3 className="font-semibold mb-4">Quick Transaction</h3>
         <div className="space-y-3">
           <Input
-            placeholder="Amount ($)"
+            placeholder=""
             value={transactionAmount}
             onChange={(e) => setTransactionAmount(e.target.value)}
             type="number"
           />
           <Input
-            placeholder="Description"
+            placeholder=""
             value={transactionDesc}
             onChange={(e) => setTransactionDesc(e.target.value)}
           />
@@ -274,7 +274,7 @@ export default function Wealth() {
         <h3 className="font-semibold mb-4">Quick Invest</h3>
         <div className="space-y-3">
           <Input
-            placeholder="Amount to invest ($)"
+            placeholder=""
             value={investmentAmount}
             onChange={(e) => setInvestmentAmount(e.target.value)}
             type="number"

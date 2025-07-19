@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Moon, Clock, Plus, Bell, Lightbulb, Thermometer, Volume2, Brain } from 'lucide-react';
+import { Moon, Clock, Plus, Bell, Lightbulb, Thermometer, Volume2, Brain, Calendar, Flame } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +19,7 @@ interface SleepRecord {
   sleep_quality: number;
   notes: string;
   created_at: string;
+  updated_at: string;
 }
 
 export function SleepTracker() {
@@ -30,10 +31,13 @@ export function SleepTracker() {
   const [sleepQuality, setSleepQuality] = useState(5);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sleepStreak, setSleepStreak] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     if (user) {
       fetchSleepRecords();
+      calculateSleepStreak();
     }
   }, [user]);
 
@@ -44,7 +48,7 @@ export function SleepTracker() {
         .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
-        .limit(7);
+        .limit(30);
 
       if (error) throw error;
       setSleepRecords(data || []);
@@ -53,6 +57,36 @@ export function SleepTracker() {
     }
   };
 
+  const calculateSleepStreak = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('sleep_records')
+        .select('created_at, sleep_duration_hours')
+        .eq('user_id', user?.id)
+        .gte('sleep_duration_hours', 6) // Minimum 6 hours for streak
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      let streak = 0;
+      const today = new Date();
+      
+      for (let i = 0; i < (data?.length || 0); i++) {
+        const recordDate = new Date(data![i].created_at);
+        const daysDiff = Math.floor((today.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff === streak) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+      
+      setSleepStreak(streak);
+    } catch (error) {
+      console.error('Error calculating sleep streak:', error);
+    }
+  };
   const calculateSleepDuration = (bedtime: string, wakeTime: string) => {
     if (!bedtime || !wakeTime) return 0;
     
@@ -69,13 +103,13 @@ export function SleepTracker() {
   };
 
   const logSleep = async () => {
-    if (!user || !bedtime || !wakeTime) return;
+    if (!user || !bedtime || !wakeTime || !selectedDate) return;
 
     setIsLoading(true);
     try {
       const duration = calculateSleepDuration(bedtime, wakeTime);
-      const bedtimeDate = new Date();
-      const wakeTimeDate = new Date();
+      const bedtimeDate = new Date(selectedDate);
+      const wakeTimeDate = new Date(selectedDate);
       
       // Set bedtime to yesterday if wake time suggests next day
       const [bedHour, bedMin] = bedtime.split(':').map(Number);
@@ -113,6 +147,7 @@ export function SleepTracker() {
       setNotes('');
       
       fetchSleepRecords();
+      calculateSleepStreak();
     } catch (error) {
       console.error('Error logging sleep:', error);
       toast({
@@ -200,6 +235,18 @@ export function SleepTracker() {
         <CardContent className="space-y-6">
           {/* Time Inputs */}
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="sleep-date" className="text-sm font-medium">Sleep Date</Label>
+              <Input
+                id="sleep-date"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="h-12"
+                max={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="wake-time" className="text-sm font-medium">Wake Time</Label>
               <Input
@@ -292,7 +339,7 @@ export function SleepTracker() {
           {/* Log Button */}
           <Button 
             onClick={logSleep} 
-            disabled={!bedtime || !wakeTime || isLoading}
+            disabled={!bedtime || !wakeTime || !selectedDate || isLoading}
             className="w-full h-12 text-base font-medium"
             size="lg"
           >
@@ -338,9 +385,30 @@ export function SleepTracker() {
       {sleepRecords.length > 0 && (
         <Card className="shadow-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Sleep Summary</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Sleep Summary
+            </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Sleep Streak */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-blue-800 dark:text-blue-200 flex items-center gap-2">
+                    <Flame className="h-5 w-5 text-orange-500" />
+                    Sleep Streak
+                  </h4>
+                  <p className="text-sm text-blue-600 dark:text-blue-300">
+                    {sleepStreak} {sleepStreak === 1 ? 'day' : 'days'} of quality sleep
+                  </p>
+                </div>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  {sleepStreak}
+                </div>
+              </div>
+            </div>
+
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-muted/50 rounded-lg">
@@ -360,14 +428,14 @@ export function SleepTracker() {
             {/* Recent Records */}
             <div className="space-y-3">
               <h4 className="font-semibold text-sm">Recent Sleep Records</h4>
-              {sleepRecords.slice(0, 3).map((record) => (
+              {sleepRecords.slice(0, 5).map((record) => (
                 <div key={record.id} className="flex justify-between items-center p-3 bg-card border rounded-lg">
                   <div className="flex-1">
                     <div className="text-sm font-medium">
                       {new Date(record.created_at).toLocaleDateString()}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      Quality: {record.sleep_quality}/10
+                      Quality: {record.sleep_quality}/10 • {new Date(record.bedtime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(record.wake_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
                   <Badge variant="outline" className="px-3 py-1 font-medium">

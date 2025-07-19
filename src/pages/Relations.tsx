@@ -240,7 +240,7 @@ export default function Relations() {
         <h3 className="font-semibold mb-4">Express Gratitude</h3>
         <div className="space-y-3">
           <Textarea
-            placeholder="Write something you're grateful for about someone special..."
+            placeholder=""
             value={gratitudeText}
             onChange={(e) => setGratitudeText(e.target.value)}
             className="min-h-20"
@@ -260,7 +260,7 @@ export default function Relations() {
         <h3 className="font-semibold mb-4">Connection Insights</h3>
         <div className="space-y-3">
           <Textarea
-            placeholder="Reflect on a meaningful interaction today..."
+            placeholder=""
             value={connectionNote}
             onChange={(e) => setConnectionNote(e.target.value)}
             className="min-h-20"

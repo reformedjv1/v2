@@ -42,6 +42,7 @@ export function ExerciseTracker() {
   const [notes, setNotes] = useState('');
   const [steps, setSteps] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   const weeklyExerciseGoal = 150; // WHO recommended minutes per week
 
@@ -89,10 +90,13 @@ export function ExerciseTracker() {
   };
 
   const addExerciseRecord = async () => {
-    if (!user || !exerciseName || !exerciseType || !duration || !intensity) return;
+    if (!user || !exerciseName || !exerciseType || !duration || !intensity || !selectedDate) return;
 
     setIsLoading(true);
     try {
+      const completedAt = new Date(selectedDate);
+      completedAt.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0);
+
       const { error } = await supabase
         .from('exercise_records')
         .insert({
@@ -103,7 +107,7 @@ export function ExerciseTracker() {
           calories_burned: Number(calories) || 0,
           intensity,
           notes,
-          completed_at: new Date().toISOString()
+          completed_at: completedAt.toISOString()
         });
 
       if (error) throw error;
@@ -135,18 +139,16 @@ export function ExerciseTracker() {
   };
 
   const updateSteps = async () => {
-    if (!user || !steps) return;
+    if (!user || !steps || !selectedDate) return;
 
     setIsLoading(true);
     try {
-      const today = new Date().toISOString().split('T')[0];
-      
       const { error } = await supabase
         .from('step_records')
         .upsert({
           user_id: user.id,
           steps: Number(steps),
-          date: today
+          date: selectedDate
         });
 
       if (error) throw error;
@@ -205,10 +207,22 @@ export function ExerciseTracker() {
         <CardContent className="space-y-6">
           {/* Exercise Name */}
           <div className="space-y-2">
+            <Label htmlFor="exercise-date" className="text-sm font-medium">Exercise Date</Label>
+            <Input
+              id="exercise-date"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="h-12"
+              max={new Date().toISOString().split('T')[0]}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="exercise-name" className="text-sm font-medium">Exercise Name</Label>
             <Input
               id="exercise-name"
-              placeholder="e.g., Push-ups, Running, Yoga"
+              placeholder="Push-ups, Running, Yoga"
               value={exerciseName}
               onChange={(e) => setExerciseName(e.target.value)}
               className="h-12"
@@ -287,7 +301,7 @@ export function ExerciseTracker() {
           {/* Log Button */}
           <Button 
             onClick={addExerciseRecord} 
-            disabled={!exerciseName || !exerciseType || !duration || !intensity || isLoading}
+            disabled={!exerciseName || !exerciseType || !duration || !intensity || !selectedDate || isLoading}
             className="w-full h-12 text-base font-medium"
             size="lg"
           >
@@ -342,7 +356,7 @@ export function ExerciseTracker() {
 
             <Button 
               onClick={updateSteps} 
-              disabled={!steps || isLoading}
+              disabled={!steps || !selectedDate || isLoading}
               className="w-full h-12 text-base font-medium"
               size="lg"
             >

@@ -213,7 +213,7 @@ export function HealthProfile() {
                 <Input
                   id="height"
                   type="number"
-                  placeholder="170"
+                  placeholder=""
                   value={profile.height_cm || ''}
                   onChange={(e) => setProfile({...profile, height_cm: Number(e.target.value)})}
                   className="h-12 text-center text-lg"
@@ -226,7 +226,7 @@ export function HealthProfile() {
                     id="weight"
                     type="number"
                     step="0.1"
-                    placeholder="70.0"
+                    placeholder=""
                     value={profile.weight_kg || ''}
                     onChange={(e) => setProfile({...profile, weight_kg: Number(e.target.value)})}
                     className="h-12 text-center text-lg"
@@ -238,7 +238,7 @@ export function HealthProfile() {
                     id="target-weight"
                     type="number"
                     step="0.1"
-                    placeholder="65.0"
+                    placeholder=""
                     value={profile.target_weight_kg || ''}
                     onChange={(e) => setProfile({...profile, target_weight_kg: Number(e.target.value)})}
                     className="h-12 text-center text-lg"

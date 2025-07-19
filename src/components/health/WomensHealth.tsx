@@ -274,7 +274,7 @@ export function WomensHealth() {
             <Label htmlFor="notes" className="text-sm font-medium">Notes (optional)</Label>
             <Textarea
               id="notes"
-              placeholder="Additional notes about your cycle..."
+              placeholder="Additional notes about your cycle"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="min-h-[80px] resize-none"

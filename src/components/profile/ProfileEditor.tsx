@@ -286,7 +286,7 @@ export function ProfileEditor() {
                 id="first-name"
                 value={profile.first_name}
                 onChange={(e) => updateProfile('first_name', e.target.value)}
-                placeholder="John"
+                placeholder=""
               />
             </div>
             <div className="space-y-2">
@@ -295,7 +295,7 @@ export function ProfileEditor() {
                 id="last-name"
                 value={profile.last_name}
                 onChange={(e) => updateProfile('last_name', e.target.value)}
-                placeholder="Doe"
+                placeholder=""
               />
             </div>
           </div>
@@ -323,7 +323,7 @@ export function ProfileEditor() {
               id="bio"
               value={profile.bio}
               onChange={(e) => updateProfile('bio', e.target.value)}
-              placeholder="Tell us about yourself..."
+              placeholder=""
               className="min-h-[80px] resize-none"
             />
           </div>
@@ -373,7 +373,7 @@ export function ProfileEditor() {
               <Input
                 id="height"
                 type="number"
-                placeholder="170"
+                placeholder=""
                 value={healthProfile.height_cm || ''}
                 onChange={(e) => updateHealthProfile('height_cm', Number(e.target.value))}
                 className="text-center"
@@ -385,7 +385,7 @@ export function ProfileEditor() {
                 id="weight"
                 type="number"
                 step="0.1"
-                placeholder="70.0"
+                placeholder=""
                 value={healthProfile.weight_kg || ''}
                 onChange={(e) => updateHealthProfile('weight_kg', Number(e.target.value))}
                 className="text-center"
@@ -478,7 +478,7 @@ export function ProfileEditor() {
               id="location"
               value={profile.location}
               onChange={(e) => updateProfile('location', e.target.value)}
-              placeholder="City, Country"
+              placeholder=""
             />
           </div>
 
