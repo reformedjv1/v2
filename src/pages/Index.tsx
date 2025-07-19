@@ -48,35 +48,35 @@ const Index = () => {
         .limit(7);
 
       // Calculate health score
-      let healthScore = 50; // Base score
+      let healthScore = 0; // Start from zero for new users
       
       if (sleepData && sleepData.length > 0) {
         const avgSleepQuality = sleepData.reduce((sum, record) => sum + (record.sleep_quality || 0), 0) / sleepData.length;
         const avgSleepDuration = sleepData.reduce((sum, record) => sum + (record.sleep_duration_hours || 0), 0) / sleepData.length;
-        healthScore += (avgSleepQuality * 2) + (avgSleepDuration >= 7 ? 15 : avgSleepDuration * 2);
+        healthScore += (avgSleepQuality * 5) + (avgSleepDuration >= 7 ? 25 : avgSleepDuration * 3);
       }
 
       if (exerciseData && exerciseData.length > 0) {
         const totalExercise = exerciseData.reduce((sum, record) => sum + (record.duration_minutes || 0), 0);
-        healthScore += Math.min(totalExercise / 10, 20); // Up to 20 points for exercise
+        healthScore += Math.min(totalExercise / 5, 35); // Up to 35 points for exercise
       }
 
       if (mentalHealthData && mentalHealthData.length > 0) {
         const avgMood = mentalHealthData.reduce((sum, record) => sum + (record.mood_rating || 0), 0) / mentalHealthData.length;
         const avgStress = mentalHealthData.reduce((sum, record) => sum + (record.stress_level || 0), 0) / mentalHealthData.length;
-        healthScore += (avgMood * 1.5) - (avgStress * 0.5);
+        healthScore += (avgMood * 3) - (avgStress * 1);
       }
 
       setHealthScore(Math.min(Math.max(Math.round(healthScore), 0), 100));
 
-      // Calculate wealth score (placeholder calculation)
-      setWealthScore(92);
+      // Wealth score starts at 0 for new users (no wealth data integration yet)
+      setWealthScore(0);
 
-      // Calculate relations score (placeholder calculation)
-      setRelationsScore(78);
+      // Relations score starts at 0 for new users (no relations data integration yet)
+      setRelationsScore(0);
 
       // Calculate overall score
-      const overall = Math.round((healthScore + 92 + 78) / 3);
+      const overall = Math.round((healthScore + 0 + 0) / 3);
       setOverallScore(overall);
 
       // Generate insights based on data
@@ -93,6 +93,15 @@ const Index = () => {
             pillar: 'health'
           });
         }
+      } else {
+        // For new users with no sleep data
+        newInsights.push({
+          emoji: '💤',
+          title: 'Start Sleep Tracking',
+          description: 'Begin tracking your sleep for better health insights',
+          action: 'Track Sleep',
+          pillar: 'health'
+        });
       }
 
       if (exerciseData && exerciseData.length < 3) {
@@ -103,15 +112,26 @@ const Index = () => {
           action: 'Exercise',
           pillar: 'health'
         });
+      } else if (!exerciseData || exerciseData.length === 0) {
+        newInsights.push({
+          emoji: '💪',
+          title: 'Start Exercise Tracking',
+          description: 'Begin logging workouts to build healthy habits',
+          action: 'Start Tracking',
+          pillar: 'health'
+        });
       }
 
-      newInsights.push({
-        emoji: '💎',
-        title: 'Investment Growth',
-        description: 'Portfolio performing above market average',
-        action: 'Review',
-        pillar: 'wealth'
-      });
+      // Only add wealth/relations insights if user has data
+      if (healthScore > 0) {
+        newInsights.push({
+          emoji: '🎯',
+          title: 'Great Start!',
+          description: 'You\'re building healthy habits. Keep it up!',
+          action: 'Continue',
+          pillar: 'health'
+        });
+      }
 
       setInsights(newInsights);
     } catch (error) {
@@ -139,7 +159,7 @@ const Index = () => {
       description: 'Build financial freedom',
       emoji: '💎',
       gradient: 'wealth-gradient',
-      stats: { value: `${wealthScore}%`, label: 'Growing', trend: '+12%' },
+      stats: { value: `${wealthScore}%`, label: wealthScore > 0 ? 'Growing' : 'Not Started', trend: wealthScore > 0 ? '+12%' : '0%' },
       color: 'text-blue-500'
     },
     {
@@ -149,7 +169,7 @@ const Index = () => {
       description: 'Strengthen connections',
       emoji: '🤝',
       gradient: 'relations-gradient',
-      stats: { value: `${relationsScore}%`, label: 'Connected', trend: '+8%' },
+      stats: { value: `${relationsScore}%`, label: relationsScore > 0 ? 'Connected' : 'Not Started', trend: relationsScore > 0 ? '+8%' : '0%' },
       color: 'text-purple-500'
     }
   ];
