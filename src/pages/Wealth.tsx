@@ -112,22 +112,22 @@ export default function Wealth() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-white/80 text-sm">Today's Wealth Score</p>
-              <h2 className="text-4xl font-bold">91</h2>
+              <h2 className="text-4xl font-bold">0</h2>
             </div>
             <div className="text-right">
               <div className="flex items-center gap-1 text-white/90">
                 <TrendingUp className="h-4 w-4" />
-                <span className="text-sm">+7 from yesterday</span>
+                <span className="text-sm">Start tracking</span>
               </div>
-              <p className="text-xs text-white/70 mt-1">Excellent growth</p>
+              <p className="text-xs text-white/70 mt-1">Begin building wealth</p>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-white/80">
               <span>Financial wellness</span>
-              <span>91%</span>
+              <span>0%</span>
             </div>
-            <Progress value={91} className="h-2 bg-white/20" />
+            <Progress value={0} className="h-2 bg-white/20" />
           </div>
         </CardContent>
       </Card>
@@ -226,22 +226,22 @@ export default function Wealth() {
         <div className="space-y-3">
           <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-950/20 rounded-xl">
             <span className="text-sm font-medium">Income</span>
-            <span className="font-bold text-green-600">+$6,500</span>
+            <span className="font-bold text-green-600">+$0</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-950/20 rounded-xl">
             <span className="text-sm font-medium">Expenses</span>
-            <span className="font-bold text-red-600">-$4,200</span>
+            <span className="font-bold text-red-600">-$0</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-primary/10 rounded-xl">
             <span className="font-semibold">Net Income</span>
-            <span className="font-bold text-primary">+$2,300</span>
+            <span className="font-bold text-primary">+$0</span>
           </div>
           <div className="pt-2">
             <div className="flex justify-between text-sm mb-2">
               <span>Savings Rate</span>
-              <span className="font-medium">35%</span>
+              <span className="font-medium">0%</span>
             </div>
-            <Progress value={35} className="h-2" />
+            <Progress value={0} className="h-2" />
           </div>
         </div>
       </Card>
@@ -252,22 +252,28 @@ export default function Wealth() {
     <div className="space-y-4">
       <Card className="ios-card">
         <h3 className="font-semibold mb-4">Investment Portfolio</h3>
-        <div className="space-y-3">
-          {investments.map((investment, index) => (
-            <div key={index} className="ios-list-item haptic-selection">
-              <div className="text-2xl mr-3">{investment.emoji}</div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{investment.name}</p>
-                <p className="text-xs text-muted-foreground">${investment.value.toLocaleString()} • {investment.allocation}%</p>
-              </div>
-              <div className="text-right">
-                <div className={`text-sm font-medium ${investment.positive ? 'text-green-600' : 'text-red-600'}`}>
-                  {investment.change}
+        {investments.length > 0 ? (
+          <div className="space-y-3">
+            {investments.map((investment, index) => (
+              <div key={index} className="ios-list-item haptic-selection">
+                <div className="text-2xl mr-3">{investment.emoji}</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{investment.name}</p>
+                  <p className="text-xs text-muted-foreground">${investment.value.toLocaleString()} • {investment.allocation}%</p>
+                </div>
+                <div className="text-right">
+                  <div className={`text-sm font-medium ${investment.positive ? 'text-green-600' : 'text-red-600'}`}>
+                    {investment.change}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">
+            No investments yet. Start building your portfolio!
+          </p>
+        )}
       </Card>
 
       <Card className="ios-card">
@@ -323,20 +329,26 @@ export default function Wealth() {
     <div className="space-y-4">
       <Card className="ios-card">
         <h3 className="font-semibold mb-4">Monthly Expenses</h3>
-        <div className="space-y-3">
-          {expenses.map((expense, index) => (
-            <div key={index} className="ios-list-item">
-              <div className="text-2xl mr-3">{expense.emoji}</div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{expense.category}</p>
-                <p className="text-xs text-muted-foreground">${expense.amount} • {expense.percentage}%</p>
+        {expenses.length > 0 ? (
+          <div className="space-y-3">
+            {expenses.map((expense, index) => (
+              <div key={index} className="ios-list-item">
+                <div className="text-2xl mr-3">{expense.emoji}</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{expense.category}</p>
+                  <p className="text-xs text-muted-foreground">${expense.amount} • {expense.percentage}%</p>
+                </div>
+                <div className="w-16">
+                  <Progress value={expense.percentage} className="h-2" />
+                </div>
               </div>
-              <div className="w-16">
-                <Progress value={expense.percentage} className="h-2" />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">
+            No expenses tracked yet. Start logging your spending!
+          </p>
+        )}
       </Card>
 
       <Card className="ios-card">
@@ -367,26 +379,32 @@ export default function Wealth() {
     <div className="space-y-4">
       <Card className="ios-card">
         <h3 className="font-semibold mb-4">Financial Goals</h3>
-        <div className="space-y-4">
-          {goals.map((goal, index) => (
-            <div key={index} className="p-4 border rounded-xl">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{goal.emoji}</span>
-                  <h4 className="font-medium text-sm">{goal.name}</h4>
+        {goals.length > 0 ? (
+          <div className="space-y-4">
+            {goals.map((goal, index) => (
+              <div key={index} className="p-4 border rounded-xl">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{goal.emoji}</span>
+                    <h4 className="font-medium text-sm">{goal.name}</h4>
+                  </div>
+                  <span className="text-sm font-medium">{goal.progress}%</span>
                 </div>
-                <span className="text-sm font-medium">{goal.progress}%</span>
+                <p className="text-xs text-muted-foreground mb-3">
+                  ${goal.current.toLocaleString()} of ${goal.target.toLocaleString()}
+                </p>
+                <Progress value={goal.progress} className="h-2 mb-2" />
+                <div className="text-xs text-muted-foreground">
+                  ${(goal.target - goal.current).toLocaleString()} remaining
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">
-                ${goal.current.toLocaleString()} of ${goal.target.toLocaleString()}
-              </p>
-              <Progress value={goal.progress} className="h-2 mb-2" />
-              <div className="text-xs text-muted-foreground">
-                ${(goal.target - goal.current).toLocaleString()} remaining
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">
+            No financial goals set yet. Create your first goal!
+          </p>
+        )}
       </Card>
 
       <Card className="ios-card">

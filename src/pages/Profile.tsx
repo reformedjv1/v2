@@ -89,16 +89,16 @@ export default function Profile() {
   };
 
   const stats = [
-    { label: 'Health Score', value: 82, unit: '/100', color: 'text-green-600', icon: Heart },
-    { label: 'Wealth Score', value: 91, unit: '/100', color: 'text-blue-600', icon: TrendingUp },
-    { label: 'Relations Score', value: 89, unit: '/100', color: 'text-purple-600', icon: Target },
-    { label: 'Overall Wellness', value: 87, unit: '/100', color: 'text-orange-600', icon: Star }
+    { label: 'Health Score', value: 0, unit: '/100', color: 'text-green-600', icon: Heart },
+    { label: 'Wealth Score', value: 0, unit: '/100', color: 'text-blue-600', icon: TrendingUp },
+    { label: 'Relations Score', value: 0, unit: '/100', color: 'text-purple-600', icon: Target },
+    { label: 'Overall Wellness', value: 0, unit: '/100', color: 'text-orange-600', icon: Star }
   ];
 
   const achievements = [
-    { title: 'First Week Complete', emoji: '🎯', description: 'Completed your first week of tracking', earned: true },
-    { title: 'Health Master', emoji: '💚', description: 'Maintained 80+ health score for 5 days', earned: true },
-    { title: 'Wealth Builder', emoji: '💎', description: 'Set up your first financial goal', earned: true },
+    { title: 'First Week Complete', emoji: '🎯', description: 'Completed your first week of tracking', earned: false },
+    { title: 'Health Master', emoji: '💚', description: 'Maintained 80+ health score for 5 days', earned: false },
+    { title: 'Wealth Builder', emoji: '💎', description: 'Set up your first financial goal', earned: false },
     { title: 'Social Butterfly', emoji: '🤝', description: 'Connected with 3 different people this week', earned: false },
     { title: 'Consistency King', emoji: '👑', description: 'Track daily for 30 days straight', earned: false },
     { title: 'Triple Threat', emoji: '⭐', description: 'Score 90+ in all three pillars', earned: false }

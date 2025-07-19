@@ -126,22 +126,22 @@ export default function Relations() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-white/80 text-sm">Today's Connection Score</p>
-              <h2 className="text-4xl font-bold">89</h2>
+              <h2 className="text-4xl font-bold">0</h2>
             </div>
             <div className="text-right">
               <div className="flex items-center gap-1 text-white/90">
                 <TrendingUp className="h-4 w-4" />
-                <span className="text-sm">+8 from yesterday</span>
+                <span className="text-sm">Start connecting</span>
               </div>
-              <p className="text-xs text-white/70 mt-1">Strong bonds</p>
+              <p className="text-xs text-white/70 mt-1">Build relationships</p>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-white/80">
               <span>Relationship wellness</span>
-              <span>89%</span>
+              <span>0%</span>
             </div>
-            <Progress value={89} className="h-2 bg-white/20" />
+            <Progress value={0} className="h-2 bg-white/20" />
           </div>
         </CardContent>
       </Card>
@@ -213,24 +213,26 @@ export default function Relations() {
       </Card>
 
       {/* Key Relationships */}
-      <Card className="ios-card">
-        <h3 className="font-semibold mb-4">Key Relationships</h3>
-        <div className="space-y-3">
-          {relationships.map((relationship, index) => (
-            <div key={index} className="ios-list-item haptic-selection">
-              <div className="text-2xl mr-3">{relationship.emoji}</div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{relationship.name}</p>
-                <p className="text-xs text-muted-foreground">{relationship.type} • {relationship.lastContact}</p>
+      {relationships.length > 0 && (
+        <Card className="ios-card">
+          <h3 className="font-semibold mb-4">Key Relationships</h3>
+          <div className="space-y-3">
+            {relationships.map((relationship, index) => (
+              <div key={index} className="ios-list-item haptic-selection">
+                <div className="text-2xl mr-3">{relationship.emoji}</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{relationship.name}</p>
+                  <p className="text-xs text-muted-foreground">{relationship.type} • {relationship.lastContact}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-medium">{relationship.strength}%</div>
+                  <div className="text-xs text-muted-foreground">{relationship.status}</div>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm font-medium">{relationship.strength}%</div>
-                <div className="text-xs text-muted-foreground">{relationship.status}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 

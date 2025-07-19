@@ -122,22 +122,22 @@ export default function Health() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-white/80 text-sm">Today's Health Score</p>
-              <h2 className="text-4xl font-bold">82</h2>
+              <h2 className="text-4xl font-bold">0</h2>
             </div>
             <div className="text-right">
               <div className="flex items-center gap-1 text-white/90">
                 <TrendingUp className="h-4 w-4" />
-                <span className="text-sm">+5 from yesterday</span>
+                <span className="text-sm">Start tracking</span>
               </div>
-              <p className="text-xs text-white/70 mt-1">Above average</p>
+              <p className="text-xs text-white/70 mt-1">Begin your journey</p>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-white/80">
               <span>Overall wellness</span>
-              <span>82%</span>
+              <span>0%</span>
             </div>
-            <Progress value={82} className="h-2 bg-white/20" />
+            <Progress value={0} className="h-2 bg-white/20" />
           </div>
         </CardContent>
       </Card>
@@ -209,26 +209,28 @@ export default function Health() {
       </Card>
 
       {/* Recent Activity */}
-      <Card className="ios-card">
-        <h3 className="font-semibold mb-4">Recent Activity</h3>
-        <div className="space-y-3">
-          {recentActivity.map((activity, index) => {
-            const Icon = activity.icon;
-            return (
-              <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-                <div className={`w-10 h-10 rounded-xl ${activity.color} flex items-center justify-center`}>
-                  <Icon className="h-5 w-5" />
+      {recentActivity.length > 0 && (
+        <Card className="ios-card">
+          <h3 className="font-semibold mb-4">Recent Activity</h3>
+          <div className="space-y-3">
+            {recentActivity.map((activity, index) => {
+              const Icon = activity.icon;
+              return (
+                <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
+                  <div className={`w-10 h-10 rounded-xl ${activity.color} flex items-center justify-center`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{activity.title}</p>
+                    <p className="text-xs text-muted-foreground">{activity.description}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{activity.time}</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{activity.title}</p>
-                  <p className="text-xs text-muted-foreground">{activity.description}</p>
-                </div>
-                <span className="text-xs text-muted-foreground">{activity.time}</span>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+              );
+            })}
+          </div>
+        </Card>
+      )}
     </div>
   );
 

@@ -59,12 +59,12 @@ export function NutritionTracker() {
   };
 
   const vitamins = [
-    { name: 'Vitamin D', current: 15, target: 20, unit: 'mcg', color: 'bg-yellow-500' },
-    { name: 'Vitamin C', current: 75, target: 90, unit: 'mg', color: 'bg-orange-500' },
-    { name: 'Iron', current: 12, target: 18, unit: 'mg', color: 'bg-red-500' },
-    { name: 'Calcium', current: 800, target: 1000, unit: 'mg', color: 'bg-blue-500' },
-    { name: 'B12', current: 2.1, target: 2.4, unit: 'mcg', color: 'bg-green-500' },
-    { name: 'Folate', current: 320, target: 400, unit: 'mcg', color: 'bg-purple-500' }
+    { name: 'Vitamin D', current: 0, target: 20, unit: 'mcg', color: 'bg-yellow-500' },
+    { name: 'Vitamin C', current: 0, target: 90, unit: 'mg', color: 'bg-orange-500' },
+    { name: 'Iron', current: 0, target: 18, unit: 'mg', color: 'bg-red-500' },
+    { name: 'Calcium', current: 0, target: 1000, unit: 'mg', color: 'bg-blue-500' },
+    { name: 'B12', current: 0, target: 2.4, unit: 'mcg', color: 'bg-green-500' },
+    { name: 'Folate', current: 0, target: 400, unit: 'mcg', color: 'bg-purple-500' }
   ];
 
   useEffect(() => {
