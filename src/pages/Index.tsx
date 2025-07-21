@@ -16,6 +16,9 @@ const Index = () => {
   const [overallScore, setOverallScore] = useState(0);
   const [insights, setInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [healthTrend, setHealthTrend] = useState('0%');
+  const [wealthTrend, setWealthTrend] = useState('0%');
+  const [relationsTrend, setRelationsTrend] = useState('0%');
 
   useEffect(() => {
     if (user) {
@@ -69,11 +72,31 @@ const Index = () => {
 
       setHealthScore(Math.min(Math.max(Math.round(healthScore), 0), 100));
 
-      // Wealth score starts at 0 for new users (no wealth data integration yet)
-      setWealthScore(0);
+      // Calculate health trend (compare with previous week)
+      const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      
+      const { data: previousWeekData } = await supabase
+        .from('sleep_records')
+        .select('sleep_quality')
+        .eq('user_id', user?.id)
+        .lt('created_at', oneWeekAgo)
+        .order('created_at', { ascending: false })
+        .limit(7);
 
-      // Relations score starts at 0 for new users (no relations data integration yet)
+      if (previousWeekData && previousWeekData.length > 0 && sleepData && sleepData.length > 0) {
+        const prevAvgQuality = previousWeekData.reduce((sum, record) => sum + (record.sleep_quality || 0), 0) / previousWeekData.length;
+        const currentAvgQuality = sleepData.reduce((sum, record) => sum + (record.sleep_quality || 0), 0) / sleepData.length;
+        const trendChange = ((currentAvgQuality - prevAvgQuality) / prevAvgQuality) * 100;
+        setHealthTrend(trendChange > 0 ? `+${trendChange.toFixed(1)}%` : `${trendChange.toFixed(1)}%`);
+      } else {
+        setHealthTrend('0%');
+      }
+
+      // Wealth and relations scores start at 0 for new users (no data integration yet)
+      setWealthScore(0);
+      setWealthTrend('0%');
       setRelationsScore(0);
+      setRelationsTrend('0%');
 
       // Calculate overall score
       const overall = Math.round((healthScore + 0 + 0) / 3);
@@ -150,6 +173,7 @@ const Index = () => {
       emoji: '💚',
       gradient: 'health-gradient',
       stats: { value: `${healthScore}%`, label: 'Optimized', trend: loading ? '...' : '+5%' },
+      stats: { value: `${healthScore}%`, label: healthScore > 0 ? 'Optimized' : 'Not Started', trend: loading ? '...' : healthTrend },
       color: 'text-green-500'
     },
     {
@@ -159,7 +183,7 @@ const Index = () => {
       description: 'Build financial freedom',
       emoji: '💎',
       gradient: 'wealth-gradient',
-      stats: { value: `${wealthScore}%`, label: wealthScore > 0 ? 'Growing' : 'Not Started', trend: wealthScore > 0 ? '+12%' : '0%' },
+      stats: { value: `${wealthScore}%`, label: wealthScore > 0 ? 'Growing' : 'Not Started', trend: wealthTrend },
       color: 'text-blue-500'
     },
     {
@@ -169,7 +193,7 @@ const Index = () => {
       description: 'Strengthen connections',
       emoji: '🤝',
       gradient: 'relations-gradient',
-      stats: { value: `${relationsScore}%`, label: relationsScore > 0 ? 'Connected' : 'Not Started', trend: relationsScore > 0 ? '+8%' : '0%' },
+      stats: { value: `${relationsScore}%`, label: relationsScore > 0 ? 'Connected' : 'Not Started', trend: relationsTrend },
       color: 'text-purple-500'
     }
   ];
@@ -226,7 +250,7 @@ const Index = () => {
               <p className="text-sm text-muted-foreground mb-4">Overall Trinity Score</p>
               <div className="flex items-center justify-center gap-1 text-green-600 text-sm">
                 <ArrowUpRight className="h-4 w-4" />
-                <span>{loading ? 'Loading...' : '+8% from last week'}</span>
+                <span>{loading ? 'Loading...' : overallScore > 0 ? 'Progress tracking' : 'Start your journey'}</span>
               </div>
             </div>
           </CardContent>
