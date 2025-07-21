@@ -33,12 +33,12 @@ export default function Wealth() {
   const [transactionDesc, setTransactionDesc] = useState('');
   const [investmentAmount, setInvestmentAmount] = useState('');
 
-  const wealthMetrics = [
-    { label: 'Net Worth', value: 127000, unit: '', icon: Wallet, color: 'bg-green-500', trend: '+24%', prefix: '$' },
-    { label: 'Monthly Income', value: 6500, unit: '', icon: ArrowUpRight, color: 'bg-blue-500', trend: '+12%', prefix: '$' },
-    { label: 'Savings Rate', value: 35, unit: '%', icon: PiggyBank, color: 'bg-purple-500', trend: '+8%', prefix: '' },
-    { label: 'Investment Growth', value: 12.4, unit: '%', icon: TrendingUp, color: 'bg-orange-500', trend: '+2.1%', prefix: '+' }
-  ];
+  const [wealthMetrics, setWealthMetrics] = useState([
+    { label: 'Net Worth', value: 0, unit: '', icon: Wallet, color: 'bg-green-500', trend: '0%', prefix: '$' },
+    { label: 'Monthly Income', value: 0, unit: '', icon: ArrowUpRight, color: 'bg-blue-500', trend: '0%', prefix: '$' },
+    { label: 'Savings Rate', value: 0, unit: '%', icon: PiggyBank, color: 'bg-purple-500', trend: '0%', prefix: '' },
+    { label: 'Investment Growth', value: 0, unit: '%', icon: TrendingUp, color: 'bg-orange-500', trend: '0%', prefix: '' }
+  ]);
 
   const quickActions = [
     { 
@@ -78,31 +78,17 @@ export default function Wealth() {
     }
   ];
 
-  const todaysGoals = [
-    { label: 'Daily spending limit', current: 85, target: 100, unit: '$' },
-    { label: 'Investment allocation', current: 500, target: 500, unit: '$' },
-    { label: 'Savings target', current: 1200, target: 1500, unit: '$' }
-  ];
+  const [todaysGoals, setTodaysGoals] = useState([
+    { label: 'Daily spending limit', current: 0, target: 100, unit: '$' },
+    { label: 'Investment allocation', current: 0, target: 500, unit: '$' },
+    { label: 'Savings target', current: 0, target: 1500, unit: '$' }
+  ]);
 
-  const investments = [
-    { name: 'S&P 500 ETF', emoji: '📈', value: 45000, allocation: 60, change: '+12.4%', positive: true },
-    { name: 'International ETF', emoji: '🌍', value: 22500, allocation: 30, change: '+8.7%', positive: true },
-    { name: 'Bonds ETF', emoji: '🏦', value: 7500, allocation: 10, change: '+3.2%', positive: true }
-  ];
+  const [investments, setInvestments] = useState<any[]>([]);
 
-  const expenses = [
-    { category: 'Housing', emoji: '🏠', amount: 1800, percentage: 43 },
-    { category: 'Food', emoji: '🍽️', amount: 800, percentage: 19 },
-    { category: 'Transportation', emoji: '🚗', amount: 400, percentage: 10 },
-    { category: 'Entertainment', emoji: '🎬', amount: 300, percentage: 7 },
-    { category: 'Other', emoji: '📦', amount: 900, percentage: 21 }
-  ];
+  const [expenses, setExpenses] = useState<any[]>([]);
 
-  const goals = [
-    { name: 'Emergency Fund', emoji: '🚨', target: 25000, current: 18000, progress: 72 },
-    { name: 'House Down Payment', emoji: '🏡', target: 50000, current: 32000, progress: 64 },
-    { name: 'Retirement Fund', emoji: '👴', target: 1000000, current: 75000, progress: 7.5 }
-  ];
+  const [goals, setGoals] = useState<any[]>([]);
 
   const renderOverview = () => (
     <div className="space-y-6">

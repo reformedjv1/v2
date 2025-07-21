@@ -232,6 +232,9 @@ export function NutritionTracker() {
             <Droplets className="h-5 w-5" />
             Vitamins & Minerals
           </CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Vitamin and mineral tracking requires detailed food database integration. Currently showing baseline values.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
@@ -255,6 +258,12 @@ export function NutritionTracker() {
                 </div>
               );
             })}
+          </div>
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              <strong>Note:</strong> Vitamin and mineral tracking will be available when detailed nutritional data is integrated. 
+              For now, focus on logging your meals to track calories and macronutrients.
+            </p>
           </div>
         </CardContent>
       </Card>

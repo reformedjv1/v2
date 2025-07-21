@@ -35,13 +35,16 @@ export default function Health() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [userGender, setUserGender] = useState<string | null>(null);
+  const [dailyCaloricTarget, setDailyCaloricTarget] = useState(2000);
+  const [todaysNutrition, setTodaysNutrition] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
+  const [todaysSteps, setTodaysSteps] = useState(0);
+  const [todaysExercise, setTodaysExercise] = useState(0);
 
-  const healthMetrics = [
-    { label: 'Sleep Score', value: 78, unit: '/100', icon: Moon, color: 'bg-blue-500', trend: '+5%' },
-    { label: 'Energy Level', value: 85, unit: '%', icon: Zap, color: 'bg-yellow-500', trend: '+12%' },
-    { label: 'Steps Today', value: 8420, unit: '', icon: Activity, color: 'bg-green-500', trend: '+2.3k' },
-    { label: 'Heart Rate', value: 72, unit: 'bpm', icon: Heart, color: 'bg-red-500', trend: 'normal' }
-  ];
+  const [healthMetrics, setHealthMetrics] = useState([
+    { label: 'Sleep Score', value: 0, unit: '/100', icon: Moon, color: 'bg-blue-500', trend: '0%' },
+    { label: 'Energy Level', value: 0, unit: '%', icon: Zap, color: 'bg-yellow-500', trend: '0%' },
+    { label: 'Steps Today', value: 0, unit: '', icon: Activity, color: 'bg-green-500', trend: '0' }
+  ]);
 
   const quickActions = [
     { label: 'Log Sleep', icon: Moon, action: () => setActiveTab('sleep') },
@@ -50,35 +53,13 @@ export default function Health() {
     { label: 'Mood Check', icon: Brain, action: () => setActiveTab('mental-health') }
   ];
 
-  const todaysGoals = [
-    { label: 'Steps', current: 8420, target: 10000, unit: '' },
-    { label: 'Water intake', current: 6, target: 8, unit: ' glasses' },
-    { label: 'Sleep target', current: 7.5, target: 8, unit: ' hours' }
-  ];
+  const [todaysGoals, setTodaysGoals] = useState([
+    { label: 'Steps', current: 0, target: 10000, unit: '' },
+    { label: 'Calories', current: 0, target: 2000, unit: ' cal' },
+    { label: 'Exercise', current: 0, target: 30, unit: ' min' }
+  ]);
 
-  const recentActivity = [
-    {
-      icon: Moon,
-      color: 'bg-blue-100 text-blue-600',
-      title: 'Sleep logged',
-      description: '7h 30m • Good quality',
-      time: '2h ago'
-    },
-    {
-      icon: Utensils,
-      color: 'bg-green-100 text-green-600',
-      title: 'Breakfast logged',
-      description: 'Oatmeal with berries • 320 cal',
-      time: '4h ago'
-    },
-    {
-      icon: Dumbbell,
-      color: 'bg-purple-100 text-purple-600',
-      title: 'Workout completed',
-      description: '45min strength training',
-      time: '6h ago'
-    }
-  ];
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -88,9 +69,10 @@ export default function Health() {
 
   const fetchUserGender = async () => {
     try {
+      // Fetch user gender and health profile data
       const { data, error } = await supabase
         .from('user_profiles_health')
-        .select('gender')
+        .select('gender, daily_caloric_target')
         .eq('user_id', user?.id)
         .maybeSingle();
 
@@ -101,9 +83,146 @@ export default function Health() {
       
       if (data) {
         setUserGender(data.gender);
+        setDailyCaloricTarget(data.daily_caloric_target || 2000);
       }
+      
+      // Fetch today's data
+      await fetchTodaysData();
     } catch (error) {
       console.error('Error fetching user gender:', error);
+    }
+  };
+
+  const fetchTodaysData = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    try {
+      // Fetch today's nutrition
+      const { data: foodData } = await supabase
+        .from('food_entries')
+        .select('total_calories, protein_g, carbs_g, fat_g')
+        .eq('user_id', user?.id)
+        .gte('consumed_at', `${today}T00:00:00`)
+        .lte('consumed_at', `${today}T23:59:59`);
+
+      if (foodData) {
+        const nutrition = foodData.reduce((acc, entry) => ({
+          calories: acc.calories + (entry.total_calories || 0),
+          protein: acc.protein + (entry.protein_g || 0),
+          carbs: acc.carbs + (entry.carbs_g || 0),
+          fat: acc.fat + (entry.fat_g || 0)
+        }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+        
+        setTodaysNutrition(nutrition);
+      }
+
+      // Fetch today's steps
+      const { data: stepData } = await supabase
+        .from('step_records')
+        .select('steps')
+        .eq('user_id', user?.id)
+        .eq('date', today)
+        .maybeSingle();
+
+      if (stepData) {
+        setTodaysSteps(stepData.steps);
+      }
+
+      // Fetch today's exercise
+      const { data: exerciseData } = await supabase
+        .from('exercise_records')
+        .select('duration_minutes')
+        .eq('user_id', user?.id)
+        .gte('completed_at', `${today}T00:00:00`)
+        .lte('completed_at', `${today}T23:59:59`);
+
+      if (exerciseData) {
+        const totalExercise = exerciseData.reduce((sum, record) => sum + (record.duration_minutes || 0), 0);
+        setTodaysExercise(totalExercise);
+      }
+
+      // Fetch recent sleep data for sleep score
+      const { data: sleepData } = await supabase
+        .from('sleep_records')
+        .select('sleep_quality, sleep_duration_hours')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false })
+        .limit(7);
+
+      // Fetch recent mental health for energy level
+      const { data: mentalData } = await supabase
+        .from('mental_health_logs')
+        .select('energy_level')
+        .eq('user_id', user?.id)
+        .order('logged_at', { ascending: false })
+        .limit(7);
+
+      // Calculate metrics from real data
+      let sleepScore = 0;
+      let energyLevel = 0;
+
+      if (sleepData && sleepData.length > 0) {
+        const avgQuality = sleepData.reduce((sum, record) => sum + (record.sleep_quality || 0), 0) / sleepData.length;
+        sleepScore = Math.round(avgQuality * 10); // Convert 1-10 scale to 0-100
+      }
+
+      if (mentalData && mentalData.length > 0) {
+        const avgEnergy = mentalData.reduce((sum, record) => sum + (record.energy_level || 0), 0) / mentalData.length;
+        energyLevel = Math.round(avgEnergy * 10); // Convert 1-10 scale to 0-100
+      }
+
+      // Update health metrics with real data
+      setHealthMetrics([
+        { label: 'Sleep Score', value: sleepScore, unit: '/100', icon: Moon, color: 'bg-blue-500', trend: sleepScore > 0 ? 'Good' : '0%' },
+        { label: 'Energy Level', value: energyLevel, unit: '%', icon: Zap, color: 'bg-yellow-500', trend: energyLevel > 0 ? 'Stable' : '0%' },
+        { label: 'Steps Today', value: todaysSteps, unit: '', icon: Activity, color: 'bg-green-500', trend: todaysSteps > 0 ? 'Active' : '0' }
+      ]);
+
+      // Update today's goals with real data
+      setTodaysGoals([
+        { label: 'Steps', current: todaysSteps, target: 10000, unit: '' },
+        { label: 'Calories', current: Math.round(nutrition.calories), target: dailyCaloricTarget, unit: ' cal' },
+        { label: 'Exercise', current: totalExercise, target: 30, unit: ' min' }
+      ]);
+
+      // Fetch recent activity
+      const activities = [];
+      
+      if (sleepData && sleepData.length > 0) {
+        const latestSleep = sleepData[0];
+        activities.push({
+          icon: Moon,
+          color: 'bg-blue-100 text-blue-600',
+          title: 'Sleep logged',
+          description: `${latestSleep.sleep_duration_hours}h • Quality: ${latestSleep.sleep_quality}/10`,
+          time: 'Today'
+        });
+      }
+
+      if (foodData && foodData.length > 0) {
+        activities.push({
+          icon: Utensils,
+          color: 'bg-green-100 text-green-600',
+          title: 'Meals logged',
+          description: `${Math.round(nutrition.calories)} calories consumed`,
+          time: 'Today'
+        });
+      }
+
+      if (exerciseData && exerciseData.length > 0) {
+        activities.push({
+          icon: Dumbbell,
+          color: 'bg-purple-100 text-purple-600',
+          title: 'Exercise completed',
+          description: `${totalExercise} minutes total`,
+          time: 'Today'
+        });
+      }
+
+      setRecentActivity(activities);
+
+    } catch (error) {
+      console.error('Error fetching today\'s data:', error);
     }
   };
 

@@ -34,12 +34,12 @@ export default function Relations() {
   const [gratitudeText, setGratitudeText] = useState('');
   const [connectionNote, setConnectionNote] = useState('');
 
-  const relationshipMetrics = [
-    { label: 'Connection Score', value: 92, unit: '/100', icon: Heart, color: 'bg-red-500', trend: '+8%' },
-    { label: 'Social Energy', value: 87, unit: '%', icon: Zap, color: 'bg-yellow-500', trend: '+15%' },
-    { label: 'Quality Time', value: 74, unit: 'hrs/week', icon: Clock, color: 'bg-green-500', trend: '+5%' },
-    { label: 'Empathy Score', value: 89, unit: '/100', icon: Brain, color: 'bg-purple-500', trend: '+12%' }
-  ];
+  const [relationshipMetrics, setRelationshipMetrics] = useState([
+    { label: 'Connection Score', value: 0, unit: '/100', icon: Heart, color: 'bg-red-500', trend: '0%' },
+    { label: 'Social Energy', value: 0, unit: '%', icon: Zap, color: 'bg-yellow-500', trend: '0%' },
+    { label: 'Quality Time', value: 0, unit: 'hrs/week', icon: Clock, color: 'bg-green-500', trend: '0%' },
+    { label: 'Empathy Score', value: 0, unit: '/100', icon: Brain, color: 'bg-purple-500', trend: '0%' }
+  ]);
 
   const quickActions = [
     { 
@@ -72,31 +72,26 @@ export default function Relations() {
     }
   ];
 
-  const todaysGoals = [
-    { label: 'Quality conversations', current: 2, target: 3, unit: '' },
-    { label: 'Gratitude expressions', current: 3, target: 3, unit: '' },
-    { label: 'Active listening moments', current: 1, target: 2, unit: '' }
-  ];
+  const [todaysGoals, setTodaysGoals] = useState([
+    { label: 'Quality conversations', current: 0, target: 3, unit: '' },
+    { label: 'Gratitude expressions', current: 0, target: 3, unit: '' },
+    { label: 'Active listening moments', current: 0, target: 2, unit: '' }
+  ]);
 
-  const relationships = [
-    { name: 'Partner', emoji: '❤️', type: 'Romantic', lastContact: '2 hours ago', strength: 95, status: 'Strong' },
-    { name: 'Family', emoji: '👨‍👩‍👧‍👦', type: 'Family', lastContact: '1 day ago', strength: 88, status: 'Good' },
-    { name: 'Close Friends', emoji: '👥', type: 'Friendship', lastContact: '3 days ago', strength: 82, status: 'Good' },
-    { name: 'Colleagues', emoji: '💼', type: 'Professional', lastContact: '1 day ago', strength: 75, status: 'Stable' }
-  ];
+  const [relationships, setRelationships] = useState<any[]>([]);
 
-  const activities = [
-    { title: 'Daily Gratitude', emoji: '🙏', description: 'Write 3 things you\'re grateful for', completed: true },
-    { title: 'Quality Time', emoji: '⏰', description: 'Spend 30 minutes with loved ones', completed: true },
+  const [activities, setActivities] = useState([
+    { title: 'Daily Gratitude', emoji: '🙏', description: 'Write 3 things you\'re grateful for', completed: false },
+    { title: 'Quality Time', emoji: '⏰', description: 'Spend 30 minutes with loved ones', completed: false },
     { title: 'Active Listening', emoji: '👂', description: 'Practice mindful listening today', completed: false },
     { title: 'Express Appreciation', emoji: '💝', description: 'Tell someone why they matter', completed: false }
-  ];
+  ]);
 
-  const learningModules = [
+  const [learningModules, setLearningModules] = useState([
     { title: 'Love Languages', description: 'Discover your primary love language', time: '10 min', completed: false },
-    { title: 'Conflict Resolution', description: 'Learn healthy dispute techniques', time: '15 min', completed: true },
+    { title: 'Conflict Resolution', description: 'Learn healthy dispute techniques', time: '15 min', completed: false },
     { title: 'Emotional Intelligence', description: 'Build empathy and awareness', time: '20 min', completed: false }
-  ];
+  ]);
 
   const handleGratitudeSubmit = () => {
     if (gratitudeText.trim()) {
