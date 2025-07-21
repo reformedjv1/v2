@@ -29,10 +29,11 @@ interface USDAFood {
 }
 
 interface FoodSearchProps {
-  onFoodSelect: (food: USDAFood) => void;
+  onClose: () => void;
+  onFoodLogged: () => void;
 }
 
-export function FoodSearch({ onFoodSelect }: FoodSearchProps) {
+export function FoodSearch({ onClose, onFoodLogged }: FoodSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<USDAFood[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -65,8 +66,23 @@ export function FoodSearch({ onFoodSelect }: FoodSearchProps) {
     }
   };
 
+  const handleFoodSelect = (food: USDAFood) => {
+    // Here you would typically log the food to the database
+    // For now, we'll just call the callback
+    onFoodLogged();
+    onClose();
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+      <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Search Food</h2>
+          <Button variant="ghost" onClick={onClose}>
+            ✕
+          </Button>
+        </div>
+        
       {/* Search Input */}
       <div className="flex gap-2">
         <Input
@@ -130,7 +146,7 @@ export function FoodSearch({ onFoodSelect }: FoodSearchProps) {
                       </div>
                       <Button
                         size="sm"
-                        onClick={() => onFoodSelect(food)}
+                        onClick={() => handleFoodSelect(food)}
                         className="flex-shrink-0"
                       >
                         <Plus className="h-4 w-4" />
@@ -147,6 +163,7 @@ export function FoodSearch({ onFoodSelect }: FoodSearchProps) {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
