@@ -45,9 +45,26 @@ export default function Profile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [stats, setStats] = useState([
+    { label: 'Health Score', value: 0, unit: '/100', color: 'text-green-600', icon: Heart },
+    { label: 'Wealth Score', value: 0, unit: '/100', color: 'text-blue-600', icon: TrendingUp },
+    { label: 'Relations Score', value: 0, unit: '/100', color: 'text-purple-600', icon: Target },
+    { label: 'Overall Wellness', value: 0, unit: '/100', color: 'text-orange-600', icon: Star }
+  ]);
+
+  const [achievements, setAchievements] = useState([
+    { title: 'First Week Complete', emoji: '🎯', description: 'Completed your first week of tracking', earned: false },
+    { title: 'Health Master', emoji: '💚', description: 'Maintained 80+ health score for 5 days', earned: false },
+    { title: 'Wealth Builder', emoji: '💎', description: 'Set up your first financial goal', earned: false },
+    { title: 'Social Butterfly', emoji: '🤝', description: 'Connected with 3 different people this week', earned: false },
+    { title: 'Consistency King', emoji: '👑', description: 'Track daily for 30 days straight', earned: false },
+    { title: 'Triple Threat', emoji: '⭐', description: 'Score 90+ in all three pillars', earned: false }
+  ]);
+
   useEffect(() => {
     if (user) {
       fetchProfile();
+      fetchUserStats();
     }
   }, [user]);
 
@@ -88,21 +105,77 @@ export default function Profile() {
     }
   };
 
-  const stats = [
-    { label: 'Health Score', value: 0, unit: '/100', color: 'text-green-600', icon: Heart },
-    { label: 'Wealth Score', value: 0, unit: '/100', color: 'text-blue-600', icon: TrendingUp },
-    { label: 'Relations Score', value: 0, unit: '/100', color: 'text-purple-600', icon: Target },
-    { label: 'Overall Wellness', value: 0, unit: '/100', color: 'text-orange-600', icon: Star }
-  ];
+  const fetchUserStats = async () => {
+    try {
+      // Calculate health score from recent data
+      const { data: sleepData } = await supabase
+        .from('sleep_records')
+        .select('sleep_quality')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false })
+        .limit(7);
 
-  const achievements = [
-    { title: 'First Week Complete', emoji: '🎯', description: 'Completed your first week of tracking', earned: false },
-    { title: 'Health Master', emoji: '💚', description: 'Maintained 80+ health score for 5 days', earned: false },
-    { title: 'Wealth Builder', emoji: '💎', description: 'Set up your first financial goal', earned: false },
-    { title: 'Social Butterfly', emoji: '🤝', description: 'Connected with 3 different people this week', earned: false },
-    { title: 'Consistency King', emoji: '👑', description: 'Track daily for 30 days straight', earned: false },
-    { title: 'Triple Threat', emoji: '⭐', description: 'Score 90+ in all three pillars', earned: false }
-  ];
+      const { data: exerciseData } = await supabase
+        .from('exercise_records')
+        .select('duration_minutes')
+        .eq('user_id', user?.id)
+        .gte('completed_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+        .order('completed_at', { ascending: false });
+
+      const { data: mentalData } = await supabase
+        .from('mental_health_logs')
+        .select('mood_rating, energy_level')
+        .eq('user_id', user?.id)
+        .order('logged_at', { ascending: false })
+        .limit(7);
+
+      let healthScore = 0;
+
+      if (sleepData && sleepData.length > 0) {
+        const avgSleepQuality = sleepData.reduce((sum, record) => sum + (record.sleep_quality || 0), 0) / sleepData.length;
+        healthScore += avgSleepQuality * 10; // Convert to 0-100 scale
+      }
+
+      if (exerciseData && exerciseData.length > 0) {
+        const totalExercise = exerciseData.reduce((sum, record) => sum + (record.duration_minutes || 0), 0);
+        healthScore += Math.min(totalExercise / 5, 30); // Up to 30 points for exercise
+      }
+
+      if (mentalData && mentalData.length > 0) {
+        const avgMood = mentalData.reduce((sum, record) => sum + (record.mood_rating || 0), 0) / mentalData.length;
+        healthScore += avgMood * 3; // Up to 30 points for mental health
+      }
+
+      const finalHealthScore = Math.min(Math.max(Math.round(healthScore), 0), 100);
+      const overallScore = Math.round(finalHealthScore / 3); // Only health data available
+
+      setStats([
+        { label: 'Health Score', value: finalHealthScore, unit: '/100', color: 'text-green-600', icon: Heart },
+        { label: 'Wealth Score', value: 0, unit: '/100', color: 'text-blue-600', icon: TrendingUp },
+        { label: 'Relations Score', value: 0, unit: '/100', color: 'text-purple-600', icon: Target },
+        { label: 'Overall Wellness', value: overallScore, unit: '/100', color: 'text-orange-600', icon: Star }
+      ]);
+
+      // Check for achievements
+      const updatedAchievements = [...achievements];
+      
+      // First Week Complete - check if user has data for 7 days
+      const totalDataPoints = (sleepData?.length || 0) + (exerciseData?.length || 0) + (mentalData?.length || 0);
+      if (totalDataPoints >= 7) {
+        updatedAchievements[0].earned = true;
+      }
+
+      // Health Master - 80+ health score
+      if (finalHealthScore >= 80) {
+        updatedAchievements[1].earned = true;
+      }
+
+      setAchievements(updatedAchievements);
+
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    }
+  };
 
   const renderOverview = () => (
     <div className="space-y-6">

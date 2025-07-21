@@ -186,7 +186,7 @@ export function ExerciseTracker() {
   };
 
   const getStepProgress = () => {
-    const dailyStepGoal = 10000;
+    const dailyStepGoal = 10000; // Default step goal
     if (!todaySteps) return 0;
     return Math.min((todaySteps.steps / dailyStepGoal) * 100, 100);
   };
