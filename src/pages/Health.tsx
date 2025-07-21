@@ -181,7 +181,7 @@ export default function Health() {
       // Update today's goals with real data
       setTodaysGoals([
         { label: 'Steps', current: todaysSteps, target: 10000, unit: '' },
-        { label: 'Calories', current: Math.round(nutrition.calories), target: dailyCaloricTarget, unit: ' cal' },
+        { label: 'Calories', current: Math.round(todaysNutrition.calories), target: dailyCaloricTarget, unit: ' cal' },
         { label: 'Exercise', current: totalExercise, target: 30, unit: ' min' }
       ]);
 
@@ -204,7 +204,7 @@ export default function Health() {
           icon: Utensils,
           color: 'bg-green-100 text-green-600',
           title: 'Meals logged',
-          description: `${Math.round(nutrition.calories)} calories consumed`,
+          description: `${Math.round(todaysNutrition.calories)} calories consumed`,
           time: 'Today'
         });
       }
