@@ -54,10 +54,11 @@ interface MealIngredient {
 }
 
 interface MealCreatorProps {
-  onMealSaved?: () => void;
+  onClose: () => void;
+  onMealCreated: () => void;
 }
 
-export function MealCreator({ onMealSaved }: MealCreatorProps) {
+export function MealCreator({ onClose, onMealCreated }: MealCreatorProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [mealName, setMealName] = useState('');
@@ -150,7 +151,8 @@ export function MealCreator({ onMealSaved }: MealCreatorProps) {
       setMealName('');
       setMealType('');
       setIngredients([]);
-      onMealSaved?.();
+      onMealCreated();
+      onClose();
     } catch (error) {
       console.error('Error saving meal:', error);
       toast({
@@ -167,29 +169,36 @@ export function MealCreator({ onMealSaved }: MealCreatorProps) {
 
   if (showFoodSearch) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Add Ingredient
-          </CardTitle>
-          <Button
-            variant="outline"
-            onClick={() => setShowFoodSearch(false)}
-            className="w-fit"
-          >
-            Back to Meal
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <FoodSearch onFoodSelect={addIngredient} />
-        </CardContent>
-      </Card>
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Add Ingredient</h2>
+            <Button variant="ghost" onClick={() => setShowFoodSearch(false)}>
+              ✕
+            </Button>
+          </div>
+          <FoodSearch 
+            onClose={() => setShowFoodSearch(false)}
+            onFoodLogged={() => {
+              setShowFoodSearch(false);
+              // Ingredient will be added via addIngredient callback
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+      <div className="p-4 space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Create Meal</h2>
+          <Button variant="ghost" onClick={onClose}>
+            ✕
+          </Button>
+        </div>
+        
       {/* Meal Info */}
       <Card>
         <CardHeader>
@@ -401,6 +410,7 @@ export function MealCreator({ onMealSaved }: MealCreatorProps) {
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 }
